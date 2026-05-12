@@ -205,6 +205,16 @@ Jeżeli robisz to w innym projekcie i nie masz pod ręką gotowych plików z dzi
 
 To jest oficjalne miejsce DevExpress do przeglądania i pobierania tłumaczeń. W praktyce warto tam sprawdzić, czy potrzebny pakiet językowy już istnieje, zanim zaczniesz wyciągać pliki z innych repozytoriów albo tłumaczyć coś ręcznie.
 
+W praktyce nie chodzi tylko o samo wejście na stronę. Trzeba też faktycznie dograć pliki z pobranej paczki do projektu. Dla polskiego DevExpress daje to zwykle w katalogu podobnym do:
+
+- `DevExpressLocalizedResources_2025.2_pl\json resources\`
+
+I to właśnie te pliki trzeba skopiować do:
+
+- `CS\MainDemo.Blazor.Server\wwwroot\js\localization\`
+
+bo dopiero wtedy aplikacja ma z czego załadować tłumaczenia dla reportingu, dashboardów, rich editora czy arkuszy.
+
 ### Dlaczego nie trzeba było zmieniać `.csproj`
 
 W tym projekcie `MainDemo.Blazor.Server.csproj` ma już:
