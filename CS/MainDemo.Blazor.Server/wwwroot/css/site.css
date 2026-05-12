@@ -2,6 +2,10 @@ html, body {
     height: 100%;
 }
 
+body {
+    margin: 0;
+}
+
 app {
     display: block;
     height: 100%;
@@ -11,17 +15,91 @@ app {
     top: 0;
 }
 
+.pre-loading-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 100002;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--dxds-color-surface-neutral-default-rest, var(--bs-body-bg, #fff));
+    opacity: 1;
+    transition: opacity 0.25s ease;
+}
+
+.pre-loading-hide {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.pre-loading-image {
+    width: min(72vw, 760px);
+    height: min(24vw, 220px);
+    background: transparent url('../images/fleet-management-software.svg') center center / contain no-repeat;
+}
+
 .header-logo {
     flex-shrink: 0;
     background-color: currentColor;
     -webkit-mask: url('../images/Logo.svg');
     mask: url('../images/Logo.svg');
-    -webkit-mask-position: left;
-    mask-position: left;
+    -webkit-mask-position: center;
+    mask-position: center;
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
-    width: 164px;
-    height: 18px;
+    width: 210px;
+    height: 24px;
+}
+
+#applicationLoadingPanel .loading {
+    width: 360px;
+    height: 360px;
+}
+
+#applicationLoadingPanel .loading-image-wrapper {
+    width: 220px;
+    height: 220px;
+    min-width: 220px;
+    min-height: 220px;
+    background-color: transparent !important;
+    border-radius: 50%;
+}
+
+#applicationLoadingPanel .loading-image {
+    width: 180px;
+    height: 180px;
+    object-fit: contain;
+}
+
+#applicationLoadingPanel .loading-border {
+    width: 220px !important;
+    height: 220px !important;
+    min-width: 220px !important;
+    min-height: 220px !important;
+    border-width: 8px !important;
+    border-radius: 50% !important;
+    box-sizing: border-box;
+}
+
+#applicationLoadingPanel .loading-floated-circle {
+    width: 220px !important;
+    height: 220px !important;
+    min-width: 220px !important;
+    min-height: 220px !important;
+    border: none !important;
+    border-radius: 50% !important;
+    box-sizing: border-box;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg 300deg,
+        var(--dxds-color-border-primary-default-rest, var(--bs-primary)) 300deg 360deg
+    ) !important;
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #000 calc(100% - 8px)) !important;
+    mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #000 calc(100% - 8px)) !important;
+}
+
+#applicationLoadingPanel .loading-caption {
+    display: none !important;
 }
 
 #logon-template-component .header-logo {

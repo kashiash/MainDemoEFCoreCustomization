@@ -25,3 +25,7 @@ packages/
 ## Rider / VS Code
 .idea/
 .vscode/
+
+## Local agent state (Claude Code, Copilot)
+.claude/
+.copilot-local/

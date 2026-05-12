@@ -13,11 +13,11 @@
     <meta name="description" content="This demo allows you to store contacts, tasks, events, reports and other related data. It includes reusable XAF modules such Reports, Office, Scheduler, View Variants, AuditTrail, FileAttachments." />
     <meta name="keywords" content="DevExpress, Blazor, Security, Authentication, Authorization, Web, Service, API, Cloud, EF Core, Access Control, RBAC, Swagger, OData, Reporting, Dashboard, Validation, Audit Trail, Office, File Management" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="XAF Blazor Demo" />
+    <meta property="og:title" content="DataDrive" />
     <meta property="og:description" content="This demo allows you to store contacts, tasks, events, reports and other related data. It includes reusable XAF modules such Reports, Office, Scheduler, View Variants, AuditTrail, FileAttachments." />
     <meta property="og:image" content="https://www.devexpress.com/support/demos/i/demo-thumbs/xaf-main-demo.png" />
     <meta property="og:url" content="https://demos.devexpress.com/XAF/BlazorMainDemo" />
-    <title>XAF Blazor Demo</title>
+    <title>DataDrive</title>
     <base href="~/" />
     <!-- Google Tag Manager -->
     <script>
@@ -40,7 +40,10 @@
                 height='0' width='0' style='display:none;visibility:hidden'></iframe>
     </noscript>
     <!-- End Google Tag Manager (noscript) -->
-    <component type="typeof(SplashScreen)" render-mode="Static" param-Caption='"XAF Blazor Demo"' param-ImagePath='"images/SplashScreen.svg"' />
+    <div id="preApplicationLoadingPanel" class="pre-loading-panel">
+        <div class="pre-loading-image" role="img" aria-label="Fleet Management Software"></div>
+    </div>
+    <component type="typeof(SplashScreen)" render-mode="Static" param-Caption='"Fleet Management Software"' param-ImagePath='"images/SplashScreen.svg"' />
 
     <link href="_content/DevExpress.ExpressApp.Blazor/styles.css" asp-append-version="true" rel="stylesheet" />
     <link href="css/site.css" rel="stylesheet" />
@@ -55,7 +58,21 @@
         <component type="typeof(BlazorError)" render-mode="Static" />
     </div>
 
+    <script>
+        window.setTimeout(function() {
+            var preLoadingPanel = document.getElementById('preApplicationLoadingPanel');
+            if (!preLoadingPanel) {
+                return;
+            }
+
+            preLoadingPanel.classList.add('pre-loading-hide');
+            window.setTimeout(function() {
+                preLoadingPanel.remove();
+            }, 250);
+        }, 1400);
+    </script>
     <script src="_framework/blazor.server.js"></script>
     <script src="js/scripts.js"></script>
+    <script src="js/disable-wheel-on-editors.js"></script>
 </body>
 </html>
