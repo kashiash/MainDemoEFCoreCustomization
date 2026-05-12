@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?><Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Configurations>Debug;Release;EasyTest</Configurations>
+    <AssemblyName>MainDemo.Module</AssemblyName>
+    <RootNamespace>MainDemo.Module</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <NoWarn>$(NoWarn)</NoWarn>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors)</WarningsNotAsErrors>
+	<CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DefineConstants>$(DefineConstants);TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'EasyTest|AnyCPU' ">
+    <DefineConstants>$(DefineConstants);TRACE;DEBUG;EASYTEST</DefineConstants>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="DevExpress.Win.Design" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.CodeAnalysis" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.CloneObject" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.ConditionalAppearance" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Dashboards" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.AuditTrail.EFCore" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.ViewVariantsModule" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Validation" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.ReportsV2" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.TreeListEditors" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Office" VersionOverride="25.2.6" />
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BusinessObjects\**\*.cs" />
+    <Compile Include="CodeRules\**\*.cs" />
+    <Compile Include="Controllers\**\*.cs" />
+    <Compile Include="DatabaseUpdate\**\*.cs" />
+    <Compile Include="Properties\**\*.cs" />
+    <Compile Include="Reports\**\*.cs" />
+    <Compile Include="DemoDbEngineDetectorHelper.cs" />
+    <Compile Include="ExternalAuthentication\CustomAuthenticationProvider.cs" />
+    <Compile Include="MainDemoModule.cs" />
+    <Compile Include="MainModuleExtensions.cs" />
+    <Compile Include="UseSQLAlternativeInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="BusinessObjects\ReadMe.txt" />
+    <Content Include="Controllers\ReadMe.txt" />
+    <EmbeddedResource Include="Dashboards\PaycheckDashboard.xml" />
+    <Content Include="DatabaseUpdate\ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Controllers\**\*.resx" />
+    <EmbeddedResource Include="DatabaseUpdate\**\*.xml" />
+    <EmbeddedResource Include="DatabaseUpdate\**\*.pdf" />
+    <EmbeddedResource Include="Reports\**\*.resx" />
+    <EmbeddedResource Include="Model.DesignedDiffs.xafml" />
+    <EmbeddedResource Include="Model.DesignedDiffs.Localization.de.xafml">
+      <DependentUpon>Model.DesignedDiffs.xafml</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" />
+    <PackageReference Include="Castle.Core" />
+	<PackageReference Include="Microsoft.Build.Tasks.Core" />
+	<PackageReference Include="Microsoft.CodeAnalysis.Common" />
+	<PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+	<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" />
+    <PackageReference Include="Remote.Linq.Text.Json" />
+    <PackageReference Include="Azure.Identity" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
+    <PackageReference Include="Microsoft.Identity.Client" />
+	<PackageReference Include="Microsoft.NETCore.Platforms" />
+	<PackageReference Include="System.Runtime.Caching" />
+	<PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" />
+  </ItemGroup>
+</Project>

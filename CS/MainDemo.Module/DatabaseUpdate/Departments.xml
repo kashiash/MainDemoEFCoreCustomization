@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Departments xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Department>
+    <Title>Operations</Title>
+    <Office>401</Office>
+    <Description>The Operations Department manages the corporate campus and is responsible for all associated facilities-buildings.</Description>
+    <Location>Building 2</Location>
+    <DepartmentHead>12</DepartmentHead>
+    <ParentTitle></ParentTitle>
+  </Department>
+  <Department>
+    <Title>Development Department</Title>
+    <Office>205</Office>
+    <Description>The Information Technology Department manages the company's information infrastructure and online assets.</Description>
+    <Location>Building 2</Location>
+    <DepartmentHead>283</DepartmentHead>
+    <ParentTitle>Operations</ParentTitle>
+  </Department>
+  <Department>
+    <Title>QA Testing</Title>
+    <Office>204</Office>
+    <Description></Description>
+    <Location>Building 2</Location>
+    <DepartmentHead>3</DepartmentHead>
+    <ParentTitle>Development Department</ParentTitle>
+  </Department>
+  <Department>
+    <Title>UX Design</Title>
+    <Office>202</Office>
+    <Description></Description>
+    <Location>Building 2</Location>
+    <DepartmentHead>270</DepartmentHead>
+    <ParentTitle>Development Department</ParentTitle>
+  </Department>
+  <Department>
+    <Title>Technical Support Services</Title>
+    <Office>103</Office>
+    <Description></Description>
+    <Location>Building 2</Location>
+    <DepartmentHead>290</DepartmentHead>
+    <ParentTitle>Operations</ParentTitle>
+  </Department>
+  <Department>
+    <Title>Purchasing</Title>
+    <Office>302</Office>
+    <Description>The Purchasing Department acquires the materials and equipment necessary for production and company operations.</Description>
+    <Location>Building 2</Location>
+    <DepartmentHead>274</DepartmentHead>
+    <ParentTitle>Operations</ParentTitle>
+  </Department>
+  <Department>
+    <Title>Finance</Title>
+    <Office>102</Office>
+    <Description></Description>
+    <Location>Building 3</Location>
+    <DepartmentHead>140</DepartmentHead>
+    <ParentTitle></ParentTitle>
+  </Department>
+  <Department>
+    <Title>Finance and Accounting</Title>
+    <Office>103</Office>
+    <Description>The Finance and Accounting Department manages corporate money. The department plans, organizes, controls and accounts company finances.</Description>
+    <Location>Building 3</Location>
+    <DepartmentHead>216</DepartmentHead>
+    <ParentTitle>Finance</ParentTitle>
+  </Department>
+  <Department>
+    <Title>Mergers and Acquisitions</Title>
+    <Office>104</Office>
+    <Description>The Mergers &amp; Acquisitions Department manages assets allocated for corporate takeovers, mergers, and acquisitions.</Description>
+    <Location>Building 3</Location>
+    <DepartmentHead>41</DepartmentHead>
+    <ParentTitle>Finance</ParentTitle>
+  </Department>
+  <Department>
+    <Title>Sales and Marketing</Title>
+    <Office>404</Office>
+    <Description></Description>
+    <Location>Building 1</Location>
+    <DepartmentHead>6</DepartmentHead>
+    <ParentTitle></ParentTitle>
+  </Department>
+  <Department>
+    <Title>Sales and Client Services</Title>
+    <Office>402</Office>
+    <Description></Description>
+    <Location>Building 1</Location>
+    <DepartmentHead>281</DepartmentHead>
+    <ParentTitle>Sales and Marketing</ParentTitle>
+  </Department>
+  <Department>
+    <Title>Marketing</Title>
+    <Office>403</Office>
+    <Description>The Marketing Department directs all external communications with the public and controls the corporate brand.</Description>
+    <Location>Building 1</Location>
+    <DepartmentHead>46</DepartmentHead>
+    <ParentTitle>Sales and Marketing</ParentTitle>
+  </Department>
+  <Department>
+    <Title>Human Resources</Title>
+    <Office>401</Office>
+    <Description></Description>
+    <Location>Building 1</Location>
+    <DepartmentHead>148</DepartmentHead>
+    <ParentTitle></ParentTitle>
+  </Department>
+</Departments>

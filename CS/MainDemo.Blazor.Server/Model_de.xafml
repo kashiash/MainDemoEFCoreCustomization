@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application>
+  <ActionDesign>
+    <Actions>
+      <Action Id="FilterEditor" Caption="Filter bearbeiten" ToolTip="Filter bearbeiten" />
+    </Actions>
+  </ActionDesign>
+  <BOModel>
+    <Class Name="DevExpress.ExpressApp.Editors.CriteriaProvider" Caption="Kriteriumanbieter">
+      <OwnMembers>
+        <Member Name="FilterString" Caption="Filtertext" />
+      </OwnMembers>
+    </Class>
+  </BOModel>
+  <Localization>
+	<LocalizationGroup Name="Paycheck">
+	  <LocalizationItem Name="ChartLabel" Value="Monatlicher Gehaltszeitplan" />
+	</LocalizationGroup>
+  </Localization>
+</Application>

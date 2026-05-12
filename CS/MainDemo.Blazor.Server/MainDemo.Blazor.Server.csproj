@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?><Project Sdk="Microsoft.NET.Sdk.Web" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TargetFramework>net9.0</TargetFramework>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <Configurations>Debug;Release;EasyTest</Configurations>
+    
+    <AssemblyName>MainDemo.Blazor.Server</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <NoWarn>$(NoWarn)</NoWarn>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors)</WarningsNotAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'EasyTest|AnyCPU' ">
+    <DefineConstants>TRACE;DEBUG;EASYTEST</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Castle.Core" />
+    <PackageReference Include="Microsoft.AspNetCore.OData" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
+    <PackageReference Include="DevExtreme.AspNet.Data" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" />
+    <PackageReference Include="SkiaSharp" />
+    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" />
+    <PackageReference Include="SkiaSharp.HarfBuzz" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Win32" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="System.Drawing.Common" />
+    <PackageReference Include="System.Reactive" />
+	<PackageReference Include="Microsoft.Identity.Client" />
+	<PackageReference Include="Microsoft.Identity.Web.UI" />
+	<PackageReference Include="Microsoft.NETCore.Platforms" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MainDemo.Module\MainDemo.Module.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="DevExpress.ExpressApp.CodeAnalysis" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.WebApi.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.AuditTrail.EFCore" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Dashboards.Blazor" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.TreeListEditors" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.ViewVariantsModule.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.Drawing.Skia.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.CloneObject" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.ConditionalAppearance" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.FileAttachment.Blazor" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Notifications.Blazor" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Scheduler.Blazor.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Office.Blazor" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Scheduler.Blazor" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.ReportsV2.Blazor.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Validation.Blazor" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.ConditionalAppearance.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.ViewVariantsModule" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.AuditTrail.EFCore.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Dashboards.Blazor.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.CloneObject.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.FileAttachment.Blazor.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Notifications.Blazor.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Office.Blazor.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.ReportsV2.Blazor" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.TreeListEditors.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.WebApi" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Validation.Blazor.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.Drawing.Skia" VersionOverride="25.2.6" />
+	  
+    
+    
+    
+    
+    
+    
+    
+    
+  </ItemGroup>
+  
+  
+  <ItemGroup>
+    <Compile Include="Services\**\*.cs" />
+    <Compile Include="API\CRUD\CustomDataService.cs" />
+    <Compile Include="API\Security\AuthenticationController.cs" />
+    <Compile Include="Controllers\DisableActionsController.cs" />
+    <Compile Include="Controllers\LogonParametersViewController.cs" />
+    <Compile Include="Controllers\LogonTitleController.cs" />
+    <Compile Include="Controllers\ReportLocalizationController.cs" />
+    <Compile Include="API\Reports\ReportController.cs" />
+    <Compile Include="Controllers\UseSQLAlternativeInfoController.cs" />
+    <Compile Include="CustomTypePropertyEditor.cs" />
+    <Compile Include="MainDemoBlazorApplication.cs" />
+    <Compile Include="BlazorModule.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Startup.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="API\!!!Feedback\Readme.txt" />
+    <Content Include="API\AuditTrail\Readme.txt" />
+    <Content Include="API\FileAttachments\Readme.txt" />
+    <Content Include="API\Localization\Readme.txt" />
+    <Content Include="API\Reports\Readme.txt" />
+    <Content Include="API\Security\Readme.txt" />
+    <Content Include="Charts\*.razor" />
+    <Content Include="Pages\_Host.cshtml" />
+    <Content Include="Properties\launchSettings.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="wwwroot\**\*.*" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="_Imports.razor" />
+    <Content Include="App.razor" />
+    <Content Include="appsettings.Development.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Model.xafml" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    
+    
+    
+    
+    
+	  
+    
+    
+    
+    
+    
+    
+    
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Model_de.xafml">
+      <DependentUpon>Model.xafml</DependentUpon>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

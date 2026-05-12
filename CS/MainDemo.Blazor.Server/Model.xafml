@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Application Title="XAF Blazor Demo" PreferredLanguage="(User language)">
+	<ActionDesign>
+		<Actions>
+			<Action Id="DemoTask.MarkCompleted" ImageName="Action_MarkCompleted"/>
+		</Actions>
+	</ActionDesign>
+	<BOModel>
+		<Class Name="DevExpress.ExpressApp.Security.AuthenticationStandardLogonParameters" DefaultDetailView="AuthenticationStandardLogonParameters_DetailView_Demo" />
+		<Class Name="MainDemo.Module.BusinessObjects.Note">
+			<OwnMembers>
+				<Member Name="Text" PropertyEditorType="DevExpress.ExpressApp.Office.Blazor.Editors.RichTextPropertyEditor" DocumentStorageFormat="HTML" />
+			</OwnMembers>
+		</Class>
+		<Class Name="MainDemo.Module.BusinessObjects.Paycheck" DefaultListView="Paycheck_ListView_Varied"/>
+	</BOModel>
+  <Localization>
+	<LocalizationGroup Name="Paycheck" IsNewNode="True">
+	  <LocalizationItem Name="ChartLabel" Value="Monthly Payroll Schedule" IsNewNode="True" />
+	</LocalizationGroup>
+  </Localization>
+  <Options UIType="TabbedMDI"
+         RestoreTabbedMdiLayout="True"
+         ShowTabImage="True"
+         FormStyle="Ribbon"
+         VirtualScrollingEnabled="True">
+  </Options>
+	<NavigationItems>
+		<Items>
+			<Item Id="Default">
+				<Items>
+					<Item Id="Employee_ListView" Index="0" />
+					<Item Id="DemoTask_ListView" Index="1" />
+					<Item Id="Department_ListView" Index="2" />
+					<Item Id="Event_ListView" Index="3" />
+					<Item Id="Note" Index="4" />
+					<Item Id="MyDetails" Index="5" />
+					<Item Id="Paycheck_ListView" Index="6" ViewId="Paycheck_ListView_Varied" />
+					<Item Id="PermissionPolicyRole_ListView" Index="7" />
+					<Item Id="ApplicationUser_ListView" Index="8" />
+					<Item Id="Resume_ListView" Index="9" />
+				</Items>
+			</Item>
+		</Items>
+	</NavigationItems>
+	<Views>
+		<DetailView Id="ApplicationUser_DetailView">
+			<Items>
+				<PropertyEditor Id="Roles" PropertyEditorType="DevExpress.ExpressApp.Blazor.Editors.TagBoxListPropertyEditor" />
+			</Items>
+			<Layout>
+				<LayoutGroup Id="Main">
+					<LayoutGroup Id="SimpleEditors">
+						<LayoutGroup Id="PermissionPolicyUser">
+							<LayoutItem Id="Roles" Index="4" IsNewNode="True" />
+						</LayoutGroup>
+					</LayoutGroup>
+				</LayoutGroup>
+			</Layout>
+		</DetailView>
+		<DetailView Id="Employee_DetailView">
+			<Items>
+				<PropertyEditor Id="Photo" ImageEditorFixedHeight="176" />
+				<PropertyEditor Id="Department" DisplayFormat="{0:Title} ({0:Office}, {0:Location})" LookupEditorMode="AllItemsWithSearch" />
+				<PropertyEditor Id="Manager" DisplayFormat="{0:FullName} ({0:Email})" />
+				<DashboardViewItem Id="PaycheckChart" Caption="Paychecks chart" View="Paycheck_ListView_Chart" Criteria="Employee.ID = '@This.ID'" ActionsToolbarVisibility="Hide" IsNewNode="True" />
+			</Items>
+			<Layout>
+				<LayoutGroup Id="Main">
+					<LayoutGroup Id="SimpleEditors">
+						<LayoutGroup Id="Person">
+							<LayoutGroup Id="Person_col1" Removed="True" />
+							<LayoutGroup Id="Person_col2" Removed="True">
+								<LayoutItem Id="Photo" ShowCaption="False" ViewItem="Photo" />
+							</LayoutGroup>
+							<LayoutGroup Id="Person_inner" Caption="Person_inner" Direction="Horizontal" IsNewNode="True">
+								<LayoutGroup Id="Person_col1" Index="0" Direction="Horizontal" RelativeSize="85" ShowCaption="False" IsNewNode="True">
+									<LayoutGroup Id="Person_col1a" ShowCaption="False" Index="0" RelativeSize="50" IsNewNode="True">
+										<LayoutItem Id="FirstName" ViewItem="FirstName" Index="0" RelativeSize="28.571428571428573" IsNewNode="True" />
+										<LayoutItem Id="MiddleName" ViewItem="MiddleName" Index="1" RelativeSize="21.428571428571427" IsNewNode="True" />
+										<LayoutItem Id="LastName" ViewItem="LastName" Index="2" RelativeSize="21.428571428571427" IsNewNode="True" />
+										<LayoutItem Id="FullName" ViewItem="FullName" Index="3" RelativeSize="21.428571428571427" IsNewNode="True" />
+									</LayoutGroup>
+									<LayoutGroup Id="Person_col1b" ShowCaption="False" Index="1" RelativeSize="50" IsNewNode="True">
+										<LayoutItem Id="TitleOfCourtesy" ViewItem="TitleOfCourtesy" Index="0" RelativeSize="28.571428571428573" IsNewNode="True" />
+										<LayoutItem Id="Email" ViewItem="Email" Index="1" RelativeSize="21.428571428571427" IsNewNode="True" />
+										<LayoutItem Id="Birthday" ViewItem="Birthday" Index="2" RelativeSize="21.428571428571427" IsNewNode="True" />
+										<LayoutItem Id="Address1" ViewItem="Address1" Index="3" RelativeSize="28.571428571428573" IsNewNode="True" />
+									</LayoutGroup>
+								</LayoutGroup>
+								<LayoutGroup Id="Person_col2" Index="1" RelativeSize="15" ShowCaption="False" IsNewNode="True">
+									<LayoutItem Id="Photo" ViewItem="Photo" ShowCaption="False" Index="0" RelativeSize="100" IsNewNode="True" />
+								</LayoutGroup>
+							</LayoutGroup>
+						</LayoutGroup>
+					</LayoutGroup>
+					<TabbedGroup Id="Tabs">
+						<LayoutGroup Id="Paychecks" Direction="Vertical" RelativeSize="100" ShowCaption="True" Caption="Payroll" ImageName="BO_SaleItem" Index="3" IsNewNode="True">
+							<LayoutItem Id="PaycheckChart" ViewItem="PaycheckChart" Index="0" RelativeSize="100" IsNewNode="True" />
+						</LayoutGroup>
+					</TabbedGroup>
+				</LayoutGroup>
+			</Layout>
+		</DetailView>
+		<ListView Id="Employee_LookupListView" DataAccessMode="Client" />
+		<ListView Id="Employee_ListView">
+			<Columns>
+				<ColumnInfo Id="Photo" Index="-1" ImageEditorCustomHeight="70" SortIndex="-1" SortOrder="None" />
+				<ColumnInfo Id="TitleOfCourtesy" Index="0" MinWidth="100" />
+				<ColumnInfo Id="FirstName" MinWidth="135" />
+				<ColumnInfo Id="LastName" Width="-1" MinWidth="135" />
+				<ColumnInfo Id="Email" MinWidth="120" />
+				<ColumnInfo Id="Department" MinWidth="150" />
+				<ColumnInfo Id="Position" MinWidth="140" />
+				<ColumnInfo Id="Birthday" MinWidth="130" />
+			</Columns>
+		</ListView>
+		<ListView Id="Employee_ListView_AllColumns">
+			<Columns>
+				<ColumnInfo Id="Photo" Index="-1" ImageEditorCustomHeight="70" SortIndex="-1" SortOrder="None" />
+				<ColumnInfo Id="TitleOfCourtesy" Index="0" MinWidth="100" />
+				<ColumnInfo Id="FirstName" MinWidth="135" />
+				<ColumnInfo Id="LastName" Width="-1" MinWidth="135" />
+				<ColumnInfo Id="Email" MinWidth="120" />
+				<ColumnInfo Id="Department" MinWidth="150" />
+				<ColumnInfo Id="Position" MinWidth="140" />
+				<ColumnInfo Id="Birthday" MinWidth="130" />
+				<ColumnInfo Id="Address1" MinWidth="200" />
+			</Columns>
+		</ListView>
+		<ListView Id="Employee_Tasks_ListView">
+ 			<Columns>
+				<ColumnInfo Id="Subject" MinWidth="150" />
+				<ColumnInfo Id="Status" MinWidth="120" />
+				<ColumnInfo Id="AssignedTo" MinWidth="150" />
+				<ColumnInfo Id="EstimatedWorkHours" MinWidth="150" />
+				<ColumnInfo Id="ActualWorkHours" MinWidth="150" />
+				<ColumnInfo Id="StartDate" MinWidth="100" />
+				<ColumnInfo Id="DueDate" MinWidth="100" />
+				<ColumnInfo Id="Priority" MinWidth="115" />
+			</Columns>
+		</ListView>
+		<ListView Id="Employee_PhoneNumbers_ListView" AllowEdit="True">
+			<Columns>
+				<ColumnInfo Id="Number" MinWidth="120" />
+				<ColumnInfo Id="PhoneType" MinWidth="80" />
+			</Columns>
+		</ListView>
+		<ListView Id="Resume_Portfolio_ListView">
+			<Columns>
+				<ColumnInfo Id="File" SortIndex="-1" SortOrder="None" />
+			</Columns>
+		</ListView>
+		<DetailView Id="Department_DetailView">
+			<Items>
+				<PropertyEditor Id="Employees" />
+				<PropertyEditor Id="Positions" LookupEditorMode="AllItems" />
+			</Items>
+		</DetailView>
+		<ListView Id="Department_ListView">
+			<Columns>
+				<ColumnInfo Id="Title" MinWidth="150" />
+				<ColumnInfo Id="Location" Width="120" />
+				<ColumnInfo Id="Office" Width="105" />
+			</Columns>
+		</ListView>
+		<ListView Id="Department_Departments_ListView">
+			<Columns>
+				<ColumnInfo Id="Title" MinWidth="150" />
+				<ColumnInfo Id="Location" Width="120" />
+				<ColumnInfo Id="Office" Width="105" />
+			</Columns>
+		</ListView>
+		<ListView Id="Department_Employees_ListView">
+			<Columns>
+				<ColumnInfo Id="FullName" MinWidth="135" />
+				<ColumnInfo Id="Birthday" MinWidth="130" />
+				<ColumnInfo Id="Position" MinWidth="120" />
+				<ColumnInfo Id="Email" MinWidth="200" />
+			</Columns>
+		</ListView>
+		<ListView Id="DemoTask_ListView" InlineEditMode="Batch">
+			<Columns>
+				<ColumnInfo Id="Subject" MinWidth="150" />
+				<ColumnInfo Id="Status" MinWidth="120" />
+				<ColumnInfo Id="AssignedTo" MinWidth="150" />
+				<ColumnInfo Id="StartDate" MinWidth="100" />
+				<ColumnInfo Id="DueDate" MinWidth="100" />
+				<ColumnInfo Id="Priority" MinWidth="115" />
+				<ColumnInfo Id="PercentCompleted" MinWidth="115"/>
+			</Columns>
+		</ListView>
+		<ListView Id="DemoTask_Employees_ListView">
+			<Columns>
+				<ColumnInfo Id="FullName" MinWidth="135" />
+				<ColumnInfo Id="Position" MinWidth="120" />
+				<ColumnInfo Id="Department" MinWidth="150" />
+				<ColumnInfo Id="Birthday" MinWidth="130" />
+			</Columns>
+		</ListView>
+		<ListView Id="Note_ListView">
+			<Columns>
+				<ColumnInfo Id="Text" MinWidth="200" Index="-1" />
+				<ColumnInfo Id="Author" MinWidth="120" />
+				<ColumnInfo Id="DateTime" MinWidth="130" />
+			</Columns>
+		</ListView>
+		<DetailView Id="Paycheck_DetailView">
+			<Items>
+				<PropertyEditor Id="Employee" LookupEditorMode="AllItemsWithSearch" />
+			</Items>
+		</DetailView>
+		<ListView Id="Paycheck_ListView_Varied" ClassName="MainDemo.Module.BusinessObjects.Paycheck" IsNewNode="True">
+			<Variants IsNewNode="True">
+				<Variant Id="Default" Caption="Grid View" ViewID="Paycheck_ListView" Index="1" IsNewNode="True" />
+				<Variant Id="Chart" Caption="Chart View" ViewID="Paycheck_ListView_Chart_PerEmployee" Index="2" IsNewNode="True" />
+			</Variants>
+		</ListView>
+		<ListView Id="Paycheck_ListView">
+			<Columns>
+				<ColumnInfo Id="Employee" MinWidth="130" />
+				<ColumnInfo Id="PayPeriod" MinWidth="110" />
+				<ColumnInfo Id="PayPeriodStart" MinWidth="110" />
+				<ColumnInfo Id="PayPeriodEnd" MinWidth="110" />
+				<ColumnInfo Id="PaymentDate" MinWidth="120" />
+				<ColumnInfo Id="PayRate" MinWidth="100" />
+				<ColumnInfo Id="Hours" MinWidth="105" />
+				<ColumnInfo Id="OvertimePayRate" MinWidth="125" />
+				<ColumnInfo Id="OvertimeHours" MinWidth="125" />
+				<ColumnInfo Id="TaxRate" MinWidth="100" />
+				<ColumnInfo Id="TotalTax" MinWidth="100" />
+				<ColumnInfo Id="GrossPay" MinWidth="100" />
+				<ColumnInfo Id="NetPay" MinWidth="100" />
+			</Columns>
+		</ListView>
+		<ListView Id="Paycheck_ListView_Chart" Caption="Payroll" ClassName="MainDemo.Module.BusinessObjects.Paycheck" DataAccessMode="DataView" EditorTypeName="DevExpress.ExpressApp.Blazor.Editors.DxChartListEditor" SettingTypeName="MainDemo.Blazor.Server.Charts.PaycheckChart" IsNewNode="True">
+			<Columns>
+				<ColumnInfo Id="PaymentDate" PropertyName="PaymentDate" Index="1" IsNewNode="True" />
+				<ColumnInfo Id="NetPay" PropertyName="NetPay" Index="2" IsNewNode="True" />
+				<ColumnInfo Id="GrossPay" PropertyName="GrossPay" Index="3" IsNewNode="True" />
+			</Columns>
+		</ListView>
+		<ListView Id="Paycheck_ListView_Chart_PerEmployee" Caption="Payroll" ClassName="MainDemo.Module.BusinessObjects.Paycheck" DataAccessMode="DataView" EditorTypeName="DevExpress.ExpressApp.Blazor.Editors.DxChartListEditor" SettingTypeName="MainDemo.Blazor.Server.Charts.PaycheckChartPerEmployee" IsNewNode="True">
+			<Columns>
+				<ColumnInfo Id="PaymentDate" PropertyName="PaymentDate" Index="1" IsNewNode="True" />
+				<ColumnInfo Id="NetPay" PropertyName="NetPay" Index="2" IsNewNode="True" />
+				<ColumnInfo Id="GrossPay" PropertyName="GrossPay" Index="3" IsNewNode="True" />
+				<ColumnInfo Id="EmployeeName" PropertyName="Employee.FullName" Index="4" IsNewNode="True" />
+			</Columns>
+		</ListView>
+		<ListView Id="Employee_LookupListView" DataAccessMode="Client" />
+		<DetailView Id="AuthenticationStandardLogonParameters_DetailView_Demo" DefaultFocusedItem="UserName" CaptionLocation="Top">
+			<Layout>
+				<LayoutGroup Id="Main">
+					<LayoutGroup Id="RootGroup">
+						<LayoutGroup Id="ImageGroup">
+							<LayoutItem Id="LogonImage" Removed="True" />
+						</LayoutGroup>
+						<LayoutGroup Id="EditorsGroup">
+							<LayoutGroup Id="Text">
+								<LayoutItem Id="LogonText" />
+								<LayoutItem Id="WelcomeText" Removed="True" />
+							</LayoutGroup>
+							<LayoutGroup Id="Editors" RelativeSize="7.2">
+								<LayoutItem Id="UserName" Index="0" />
+								<LayoutItem Id="Password" Index="1" />
+							</LayoutGroup>
+							<LayoutGroup Id="PasswordHintGroup">
+								<LayoutItem Id="PasswordHint" />
+							</LayoutGroup>
+						</LayoutGroup>
+					</LayoutGroup>
+				</LayoutGroup>
+			</Layout>
+		</DetailView>
+		<ListView Id="Department_LookupListView">
+			<Columns>
+				<ColumnInfo Id="Office" PropertyName="Office" Index="1" IsNewNode="True" />
+				<ColumnInfo Id="Location" PropertyName="Location" Index="2" IsNewNode="True" />
+			</Columns>
+		</ListView>
+		<ListView Id="Employee_LookupListView" >
+			<Columns>
+				<ColumnInfo Id="Title" PropertyName="TitleOfCourtesy" Index="0" IsNewNode="True" />
+				<ColumnInfo Id="FullName" Index="1" />
+				<ColumnInfo Id="Email" PropertyName="Email" Index="2" IsNewNode="True" />
+			</Columns>
+		</ListView>
+		<ListView Id="Location_ListView">
+			<Columns>
+				<ColumnInfo Id="Title" Index="0" MinWidth="130" />
+				<ColumnInfo Id="Latitude" Index="1" MinWidth="65" />
+				<ColumnInfo Id="Longitude" Index="2" MinWidth="65" />
+			</Columns>
+		</ListView>
+		<ListView Id="Resume_ListView">
+			<Columns>
+				<ColumnInfo Id="Employee" MinWidth="130" />
+				<ColumnInfo Id="File" MinWidth="120" />
+				<ColumnInfo Id="Employee.Email" MinWidth="120" />
+				<ColumnInfo Id="Employee.Department" MinWidth="150" />
+				<ColumnInfo Id="Employee.Address" MinWidth="210" />
+			</Columns>
+		</ListView>
+		<DetailView Id="UseSQLAlternativeInfo_DetailView">
+		  <Layout>
+			<LayoutGroup Id="Main" Direction="Vertical" RelativeSize="100">
+			  <LayoutGroup Id="TopAirGroup" Index="0" ShowCaption="False" RelativeSize="15" IsNewNode="True" />
+			  <LayoutGroup Id="Info" Index="1" Direction="Horizontal" RelativeSize="85" IsNewNode="True">
+				<LayoutGroup Id="LeftAirGroup" ShowCaption="False" Index="0" RelativeSize="2" IsNewNode="True" />
+				<LayoutGroup Id="IconGroup" ShowCaption="False" Index="1" RelativeSize="21" IsNewNode="True">
+				  <LayoutItem Id="InfoStaticImage" ViewItem="InfoStaticImage" Index="0" IsNewNode="True" />
+				</LayoutGroup>
+				<LayoutGroup Id="TextInfoGroup" ShowCaption="False" Index="2" RelativeSize="72" IsNewNode="True">
+				  <LayoutItem Id="SQLIssueText" ViewItem="SQLIssueText" Index="0" RelativeSize="2.3028611304954643" IsNewNode="True" />
+				  <LayoutItem Id="AlternativeStaticText" ViewItem="AlternativeStaticText" Index="1" RelativeSize="2.3028611304954643" IsNewNode="True" />
+				  <LayoutItem Id="NoteStaticText" ViewItem="NoteStaticText" Index="2" RelativeSize="2.3028611304954643" IsNewNode="True" />
+				</LayoutGroup>
+				<LayoutGroup Id="RightAirGroup" ShowCaption="False" Index="3" RelativeSize="5" IsNewNode="True" />
+			  </LayoutGroup>
+			  <LayoutGroup Id="SimpleEditors" Removed="True" />
+			</LayoutGroup>
+		  </Layout>
+		</DetailView>
+		<DetailView Id="Event_DetailView">
+			<Items>
+				<PropertyEditor Id="Resources" PropertyEditorType="DevExpress.ExpressApp.Blazor.Editors.ComboBoxListPropertyEditor" />
+			</Items>
+			<Layout>
+				<LayoutGroup Id="Main" RelativeSize="100">
+					<LayoutGroup Id="SizeableEditors">
+						<LayoutItem Id="Resources" ViewItem="Resources" Index="2" IsNewNode="True" />
+					</LayoutGroup>
+					<LayoutGroup Id="Resources_Group" Removed="True">
+						<LayoutItem Id="Resources" Removed="True" />
+					</LayoutGroup>
+				</LayoutGroup>
+			</Layout>
+		</DetailView>
+	</Views>
+</Application>

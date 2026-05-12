@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?><Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>ExpressApp.ico</ApplicationIcon>
+    <AssemblyName>MainDemo.Win</AssemblyName>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <Configurations>Debug;Release;EasyTest</Configurations>
+    
+    <NoWarn>$(NoWarn)</NoWarn>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors)</WarningsNotAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DefineConstants>$(DefineConstants);TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'EasyTest|AnyCPU' ">
+    <DefineConstants>$(DefineConstants);TRACE;DEBUG;EASYTEST</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="DevExpress.ExpressApp.Scheduler.Win.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Win.Design" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.CodeAnalysis" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.ReportsV2.Win.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.CloneObject" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.ConditionalAppearance" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.AuditTrail.EFCore" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Dashboards.Win" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Notifications.Win.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.FileAttachment.Win" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.FileAttachment.Win.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Notifications.Win" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Dashboards.Win.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Office.Win" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.AuditTrail.EFCore.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.ReportsV2.Win" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.CloneObject.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.ConditionalAppearance.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.TreeListEditors.Win" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Scheduler.Win" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Security.EFCore.Extensions.Win" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Validation.Win.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.ViewVariantsModule.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Win.Design.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Validation.Win" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.ViewVariantsModule" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.TreeListEditors.Win.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Security.EFCore.Extensions.Win.de" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Office.Win.de" VersionOverride="25.2.6" />
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" />
+    <PackageReference Include="Castle.Core" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
+	<PackageReference Include="Microsoft.CodeAnalysis.Common" />
+	<PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    <PackageReference Include="Remote.Linq.Text.Json" />
+	<PackageReference Include="MessagePack" />
+	<PackageReference Include="Microsoft.Identity.Client.Broker" />
+	<PackageReference Include="Microsoft.NETCore.Platforms" />
+	<PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App.config" />
+    <Content Include="Controllers\ReadMe.txt" />
+    
+    <EmbeddedResource Include="Images\SplashScreenImage.svg" />
+    <Content Include="Model.xafml">
+      <Subtype>Designer</Subtype>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Compile Include="ApplicationBuilder.cs" />
+    <Compile Include="Controllers\AdjustRibbonController.cs" />
+    <Compile Include="Controllers\DemoAboutInfoController.cs" />
+    <Compile Include="Controllers\DetailViewLayoutCustomizationController.cs" />
+    <Compile Include="Controllers\EFDetailViewController.cs" />
+    <Compile Include="Controllers\RichNotesListViewController.cs" />
+    <Compile Include="Controllers\UpdateActionsOnAsyncLoadingController.cs" />
+    <Compile Include="Controllers\UseSQLAlternativeInfoController.cs" />
+    <Compile Include="Controllers\WinDateEditCalendarController.cs" />
+    <Compile Include="Initialization.cs" />
+    <Compile Include="WinModule.cs" />
+    <Compile Include="Properties\DemoApplicationVersionInfo.cs" />
+    <Compile Include="MainDemoWinApplication.cs" />
+    <Compile Include="Program.cs">
+    </Compile>
+    <Compile Include="XafDemoSplashScreen.cs" />
+    <Compile Include="XafDemoSplashScreen.Designer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MainDemo.Module\MainDemo.Module.csproj">
+      <Project>{D7B72244-7C11-414B-ABE5-A3EB78567D93}</Project>
+      <Name>MainDemo.Module.NetCore.Desktop</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?><Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <AssemblyName>MainDemoEFCore.WebAPI.Tests</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <NoWarn>$(NoWarn)</NoWarn>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors)</WarningsNotAsErrors>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+	<CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="BusinessObjectActionTests.cs" />
+    <Compile Include="CRUD_DeepUpdate_Tests.cs" />
+    <Compile Include="MediaFile_DeepUpdate_Tests.cs" />
+    <Compile Include="Utils.cs" />
+    <Compile Include="CRUDNonPersistentTests.cs" />
+    <Compile Include="CoreTests\CustomizeSecurityCriteriaOperatorTests.cs" />
+    <Compile Include="BatchTests.cs" />
+    <Compile Include="MediaFileTests.cs" />
+    <Compile Include="CRUDTests.cs" />
+    <Compile Include="CustomValidationTests.cs" />
+    <Compile Include="LocalizationTests.cs" />
+    <Compile Include="ReportTests.cs" />
+	  <Compile Include="TestInfrastructure\*.cs" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="NUnit3TestAdapter" />
+    <PackageReference Include="AutoFixture.Xunit3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Identity.Client" />
+	<PackageReference Include="Microsoft.NETCore.Platforms" />
+	<PackageReference Include="System.Runtime.Caching" />
+	<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+	<PackageReference Include="System.Drawing.Common" />
+	<PackageReference Include="System.Net.Http.WinHttpHandler" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="DevExpress.ExpressApp.CodeAnalysis" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Api.EFCore.All" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.AspNetCore.Reporting" VersionOverride="25.2.6" />
+    <PackageReference Include="DevExpress.ExpressApp.Core.All" VersionOverride="25.2.6" />
+    
+    
+    
+    
+    
+	  
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MainDemo.Blazor.Server\MainDemo.Blazor.Server.csproj" />
+    <ProjectReference Include="..\MainDemo.Module\MainDemo.Module.csproj" />
+  </ItemGroup>
+</Project>

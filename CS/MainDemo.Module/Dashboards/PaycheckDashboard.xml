@@ -1,0 +1,65 @@
+<Dashboard CurrencyCulture="en-US" RequestParameters="false">
+  <Title Text="Paycheck Dashboard" />
+  <DataSources>
+    <ObjectDataSource Name="Paycheck" ComponentName="objectDataSource1">
+      <DataSource Type="MainDemo.Module.BusinessObjects.Paycheck, MainDemo.Module, Version=25.2.0.0, Culture=neutral, PublicKeyToken=null" />
+    </ObjectDataSource>
+  </DataSources>
+  <Items>
+    <Chart ComponentName="chartDashboardItem1" Name="" ShowCaption="false" DataSource="objectDataSource1">
+      <DataItems>
+        <Measure DataMember="GrossPay" DefaultId="DataItem0" />
+        <Dimension DataMember="PayPeriod" DefaultId="DataItem1" />
+      </DataItems>
+      <Arguments>
+        <Argument DefaultId="DataItem1" />
+      </Arguments>
+      <Panes>
+        <Pane Name="Pane 1">
+          <Series>
+            <Simple Name="Gross Pay">
+              <Value DefaultId="DataItem0" />
+            </Simple>
+          </Series>
+        </Pane>
+      </Panes>
+    </Chart>
+    <Pivot ComponentName="pivotDashboardItem1" Name="Employees" DataSource="objectDataSource1">
+      <DataItems>
+        <Dimension DataMember="Employee.FullName" DefaultId="DataItem0" />
+        <Measure DataMember="Hours" Name="Hours" DefaultId="DataItem1" />
+        <Measure DataMember="OvertimeHours" Name="Overtime Hours" DefaultId="DataItem2" />
+        <Measure DataMember="NetPay" Name="Net Pay" DefaultId="DataItem3" />
+      </DataItems>
+      <Rows>
+        <Row DefaultId="DataItem0" />
+      </Rows>
+      <Values>
+        <Value DefaultId="DataItem1" />
+        <Value DefaultId="DataItem2" />
+        <Value DefaultId="DataItem3" />
+      </Values>
+    </Pivot>
+    <Pie ComponentName="pieDashboardItem1" Name="" ShowCaption="false" DataSource="objectDataSource1">
+      <DataItems>
+        <Measure DataMember="GrossPay" Name="Gross Pay per Employee" DefaultId="DataItem0" />
+        <Dimension DataMember="Employee.FullName" DefaultId="DataItem1" />
+      </DataItems>
+      <Arguments>
+        <Argument DefaultId="DataItem1" />
+      </Arguments>
+      <Values>
+        <Value DefaultId="DataItem0" />
+      </Values>
+    </Pie>
+  </Items>
+  <LayoutTree>
+    <LayoutGroup Orientation="Vertical">
+      <LayoutGroup Weight="1">
+        <LayoutItem DashboardItem="chartDashboardItem1" Weight="1" />
+        <LayoutItem DashboardItem="pieDashboardItem1" Weight="1" />
+      </LayoutGroup>
+      <LayoutItem DashboardItem="pivotDashboardItem1" Weight="1" />
+    </LayoutGroup>
+  </LayoutTree>
+</Dashboard>

@@ -1,0 +1,29 @@
+﻿@using DevExpress.Blazor
+@using DevExpress.ExpressApp
+@using DevExpress.ExpressApp.Blazor.Editors
+@using DevExpress.ExpressApp.Utils
+@using MainDemo.Module.BusinessObjects
+@using System.Linq.Expressions
+
+<label class="xaf-chart-list-editor-label">@CaptionHelper.GetLocalizedText("Paycheck", "ChartLabel")</label>
+
+<DxChartLineSeries Name="Gross Pay"
+                   ArgumentField="DataViewExpressionConverter.Convert((Paycheck p) => p.PaymentDate)"
+                   ValueField="DataViewExpressionConverter.Convert((Paycheck p) => p.GrossPay)"
+                   SummaryMethod="Enumerable.Sum" />
+
+<DxChartLineSeries Name="Net Pay"
+                   ArgumentField="DataViewExpressionConverter.Convert((Paycheck p) => p.PaymentDate)"
+                   ValueField="DataViewExpressionConverter.Convert((Paycheck p) => p.NetPay)"
+                   SummaryMethod="Enumerable.Sum" />
+
+<DxChartLegend Position="RelativePosition.Outside"
+               HorizontalAlignment="HorizontalAlignment.Center"
+               VerticalAlignment="VerticalEdge.Bottom" />
+
+<DxChartTooltip Enabled="true"
+                Position="RelativePosition.Outside">
+    <div style="margin: 0.75rem">
+        <div>@context.Series.Name, @(((DateTime)context.Point.Argument).ToString("dd MMM yyyy")): @(((decimal)context.Point.Value).ToString("0"))</div>
+    </div>
+</DxChartTooltip>

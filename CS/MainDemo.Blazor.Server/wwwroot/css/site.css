@@ -1,0 +1,83 @@
+html, body {
+    height: 100%;
+}
+
+app {
+    display: block;
+    height: 100%;
+}
+
+.adsbox {
+    top: 0;
+}
+
+.header-logo {
+    flex-shrink: 0;
+    background-color: currentColor;
+    -webkit-mask: url('../images/Logo.svg');
+    mask: url('../images/Logo.svg');
+    -webkit-mask-position: left;
+    mask-position: left;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    width: 164px;
+    height: 18px;
+}
+
+#logon-template-component .header-logo {
+    -webkit-mask-position: center;
+    mask-position: center;
+}
+
+.logon-main div[data-item-name="PasswordHint"] + .xaf-static-text {
+    width: 100%;
+    line-height: 1rem;
+    color: var(--dxds-color-content-neutral-subdued-rest);
+}
+
+body:not(.dxbl-theme-fluent) .logon-main div[data-item-name="PasswordHint"] + .xaf-static-text {
+    opacity: 0.5;
+    font-size: 0.75rem;
+}
+
+.dxbl-theme-fluent.xaf-size-s .logon-main div[data-item-name="LogonText"] + .xaf-static-text {
+    font-size: var(--dxds-font-size-base-sm);
+    line-height: var(--dxds-line-height-base-sm);
+    font-weight: var(--dxds-font-weight-base-default);
+}
+
+.dxbl-theme-fluent.xaf-size-m .logon-main div[data-item-name="LogonText"] + .xaf-static-text {
+    font-size: var(--dxds-font-size-base-md);
+    line-height: var(--dxds-line-height-base-md);
+    font-weight: var(--dxds-font-weight-base-default);
+}
+
+.dxbl-theme-fluent.xaf-size-s .logon-main .xaf-static-text {
+    font-size: var(--dxds-font-size-base-xs);
+    line-height: var(--dxds-line-height-base-xs);
+    font-weight: var(--dxds-font-weight-caption-default);
+}
+
+.dxbl-theme-fluent.xaf-size-m .logon-main .xaf-static-text {
+    font-size: var(--dxds-font-size-base-sm);
+    line-height: var(--dxds-line-height-base-sm);
+    font-weight: var(--dxds-font-weight-base-default);
+}
+
+#blazor-error-ui {
+    background: inherit;
+    bottom: 0;
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 100001;
+}
+
+/* DxChartListEditor Start */
+
+.xaf-chart-list-editor-label {
+    margin-top: 1.5rem;
+}
+
+/* DxChartListEditor End */
