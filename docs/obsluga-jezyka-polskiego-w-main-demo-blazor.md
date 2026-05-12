@@ -199,6 +199,12 @@ dodałem:
 - `pl-PL.json` został pobrany z paczki `devextreme`,
 - `dx-analytics-core.pl-PL.json` i `dx-reporting.pl-PL.json` zostały skopiowane z działającego projektu Fleetman, który już używa tych tłumaczeń.
 
+Jeżeli robisz to w innym projekcie i nie masz pod ręką gotowych plików z działającej aplikacji, najpierw zajrzyj na:
+
+- `https://localization.devexpress.com/`
+
+To jest oficjalne miejsce DevExpress do przeglądania i pobierania tłumaczeń. W praktyce warto tam sprawdzić, czy potrzebny pakiet językowy już istnieje, zanim zaczniesz wyciągać pliki z innych repozytoriów albo tłumaczyć coś ręcznie.
+
 ### Dlaczego nie trzeba było zmieniać `.csproj`
 
 W tym projekcie `MainDemo.Blazor.Server.csproj` ma już:
