@@ -31,6 +31,7 @@ public class Employee : BaseObject {
 
     public virtual String MiddleName { get; set; }
 
+    [EditorAlias("DateEditorNullable")]
     public virtual DateTime? Birthday { get; set; }
 
     [FieldSize(255)]

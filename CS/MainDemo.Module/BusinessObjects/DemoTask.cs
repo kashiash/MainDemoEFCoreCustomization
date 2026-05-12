@@ -18,6 +18,7 @@ namespace MainDemo.Module.BusinessObjects;
 [RuleCriteria("TaskIsNotStarted", DefaultContexts.Save, "Status != 'NotStarted'", CustomMessageTemplate = "Cannot set the task completed because it's not started.", TargetContextIDs = "MarkCompleted")]
 [DefaultProperty(nameof(Subject))]
 public class DemoTask : BaseObject {
+    [EditorAlias("DateEditorNullable")]
     public virtual DateTime? DateCompleted { get; set; }
 
     public virtual String Subject { get; set; }
@@ -25,8 +26,10 @@ public class DemoTask : BaseObject {
     [FieldSize(FieldSizeAttribute.Unlimited)]
     public virtual String Description { get; set; }
 
+    [EditorAlias("DateEditorNullable")]
     public virtual DateTime? DueDate { get; set; }
 
+    [EditorAlias("DateEditorNullable")]
     public virtual DateTime? StartDate { get; set; }
 
     private int percentCompleted;

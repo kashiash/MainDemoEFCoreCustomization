@@ -107,6 +107,7 @@
     <Compile Include="API\Reports\ReportController.cs" />
     <Compile Include="Controllers\UseSQLAlternativeInfoController.cs" />
     <Compile Include="CustomTypePropertyEditor.cs" />
+    <Compile Include="Editors\DateEditor.cs" />
     <Compile Include="MainDemoBlazorApplication.cs" />
     <Compile Include="BlazorModule.cs" />
     <Compile Include="Program.cs" />

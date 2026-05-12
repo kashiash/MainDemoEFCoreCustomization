@@ -1,7 +1,9 @@
 ﻿using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.DC;
+using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.BaseImpl.EF;
 using MainDemo.Blazor.Server.Controllers;
+using MainDemo.Blazor.Server.Editors;
 
 namespace MainDemo.Blazor.Server;
 
@@ -36,5 +38,10 @@ public sealed class MainDemoBlazorModule : ModuleBase {
 
     public override void CustomizeTypesInfo(ITypesInfo typesInfo) {
         base.CustomizeTypesInfo(typesInfo);
+    }
+
+    public override void ExtendModelInterfaces(ModelInterfaceExtenders extenders) {
+        base.ExtendModelInterfaces(extenders);
+        extenders.Add<IModelMemberViewItem, IModelMemberViewItemMouseWheel>();
     }
 }
