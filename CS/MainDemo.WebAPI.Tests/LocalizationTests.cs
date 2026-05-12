@@ -16,6 +16,9 @@ public class LocalizationTests : BaseWebApiTest {
         string result = await SendRequestAsync("de-DE", url);
         Assert.Equal("Benutzer", result);
 
+        result = await SendRequestAsync("pl-PL", url);
+        Assert.Equal("Użytkownik", result);
+
         result = await SendRequestAsync("en-US", url);
         Assert.Equal("Base User", result);
     }
@@ -27,6 +30,9 @@ public class LocalizationTests : BaseWebApiTest {
         string result = await SendRequestAsync("de-DE", url);
         Assert.Equal("Geburtstag", result);
 
+        result = await SendRequestAsync("pl-PL", url);
+        Assert.Equal("Data urodzenia", result);
+
         result = await SendRequestAsync("en-US", url);
         Assert.Equal("Birth Date", result);
     }
@@ -37,6 +43,9 @@ public class LocalizationTests : BaseWebApiTest {
 
         string result = await SendRequestAsync("de-DE", url);
         Assert.Equal("Setze für Aufgabe...", result);
+
+        result = await SendRequestAsync("pl-PL", url);
+        Assert.Equal("Ustaw zadanie...", result);
 
         result = await SendRequestAsync("en-US", url);
         Assert.Equal("Set Task", result);

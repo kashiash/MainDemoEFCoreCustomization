@@ -1,4 +1,5 @@
-﻿using System.Text;
+using System.Globalization;
+using System.Text;
 using Demos.Data;
 using DevExpress.ExpressApp.ApplicationBuilder;
 using DevExpress.ExpressApp.Blazor.ApplicationBuilder;
@@ -15,6 +16,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Server.Circuits;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.SignalR;
@@ -41,6 +43,22 @@ public class Startup {
         services.AddServerSideBlazor();
         services.AddHttpContextAccessor();
         services.AddScoped<CircuitHandler, Services.Circuits.CircuitHandlerProxy>();
+        services.Configure<RequestLocalizationOptions>(options => {
+            var supportedCultures = new[] {
+                new CultureInfo("pl-PL"),
+                new CultureInfo("en-US"),
+                new CultureInfo("de-DE")
+            };
+
+            options.DefaultRequestCulture = new RequestCulture("en-US");
+            options.SupportedCultures = supportedCultures;
+            options.SupportedUICultures = supportedCultures;
+            options.RequestCultureProviders = new List<IRequestCultureProvider> {
+                new QueryStringRequestCultureProvider(),
+                new CookieRequestCultureProvider(),
+                new AcceptLanguageHeaderRequestCultureProvider()
+            };
+        });
         services.AddXaf(Configuration, builder => {
             builder.UseApplication<MainDemoBlazorApplication>();
 

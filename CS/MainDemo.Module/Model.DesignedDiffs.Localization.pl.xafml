@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Application Title="MainDemo - Outlook w 60 minut!">
+  <ActionDesign>
+    <Actions>
+      <Action Id="Cancel" Caption="Anuluj" ToolTip="Anuluj" />
+      <Action Id="ClearTasksAction" Caption="Wyczyść zadania" ToolTip="Wyczyść zadania" />
+      <Action Id="Delete" Caption="Usuń" ConfirmationMessage="Czy na pewno chcesz usunąć {0} rekordów?" ToolTip="Usuń" />
+      <Action Id="DemoTask.Postpone" Caption="Odłóż" ToolTip="Odłóż" />
+      <Action Id="FullTextSearch" Caption="Wyszukiwanie pełnotekstowe" />
+      <Action Id="Link" Caption="Powiąż" ToolTip="Powiąż" />
+      <Action Id="NavigateBack" Caption="Wstecz" ToolTip="Wstecz" />
+      <Action Id="NavigateForward" Caption="Dalej" ToolTip="Dalej" />
+      <Action Id="New" Caption="Nowy" ToolTip="Nowy" />
+      <Action Id="NextObject" Caption="Następny" ToolTip="Następny" />
+      <Action Id="PreviousObject" Caption="Poprzedni" ToolTip="Poprzedni" />
+      <Action Id="Refresh" Caption="Odśwież" ToolTip="Odśwież" />
+      <Action Id="Save" Caption="Zapisz" ToolTip="Zapisz" />
+      <Action Id="SaveAndClose" Caption="Zapisz i zamknij" ToolTip="Zapisz i zamknij" />
+      <Action Id="SaveAndNew" Caption="Zapisz i nowy" ToolTip="Zapisz i nowy" />
+      <Action Id="SetTaskAction" Caption="Ustaw zadanie..." ToolTip="Ustaw zadanie..." />
+      <Action Id="ShowAllContexts" Caption="Waliduj" ToolTip="Waliduj zaznaczone obiekty we wszystkich kontekstach" />
+      <Action Id="ShowNavigationItem" Caption="Otwórz moduł" />
+      <Action Id="ShowNotesAction" Caption="Pokaż notatki" />
+      <Action Id="Unlink" Caption="Usuń powiązanie" ToolTip="Usuń powiązanie" ConfirmationMessage="Powiązania dla {0} rekordów zostaną usunięte. Czy chcesz kontynuować?" />
+    </Actions>
+    <DisableReasons>
+      <Reason Id="ByContext_RequireMultipleObjects" Caption="Musi być zaznaczony co najmniej jeden obiekt" />
+      <Reason Id="ByContext_RequireSingleObject" Caption="Musi być zaznaczony jeden obiekt" />
+      <Reason Id="Security" Caption="Brak uprawnień" />
+    </DisableReasons>
+  </ActionDesign>
+  <BOModel>
+    <Class Name="DevExpress.Persistent.BaseImpl.EF.PermissionPolicy.PermissionPolicyRole" Caption="Rola">
+      <OwnMembers>
+        <Member Name="Users" Caption="Użytkownicy" />
+      </OwnMembers>
+    </Class>
+    <Class Name="DevExpress.Persistent.BaseImpl.EF.PermissionPolicy.PermissionPolicyUser" Caption="Użytkownik">
+      <OwnMembers>
+        <Member Name="ChangePasswordOnFirstLogon" Caption="Zmień hasło przy pierwszym logowaniu" />
+        <Member Name="IsActive" Caption="Aktywny" />
+        <Member Name="Roles" Caption="Role" />
+        <Member Name="UserName" Caption="Nazwa użytkownika" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MainDemo.Module.BusinessObjects.Address" Caption="Adres">
+      <OwnMembers>
+        <Member Name="City" Caption="Miasto" />
+        <Member Name="Country" Caption="Kraj" />
+        <Member Name="FullAddress" Caption="Pełny adres" />
+        <Member Name="StateProvince" Caption="Województwo / region" />
+        <Member Name="Street" Caption="Ulica" />
+        <Member Name="ZipPostal" Caption="Kod pocztowy" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MainDemo.Module.BusinessObjects.Country" Caption="Kraj">
+      <OwnMembers>
+        <Member Name="PhoneCode" Caption="Kierunkowy" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MainDemo.Module.BusinessObjects.DemoTask" Caption="Zadanie">
+      <OwnMembers>
+        <Member Name="ActualWorkHours" Caption="Rzeczywiste godziny pracy" />
+        <Member Name="Employees" Caption="Pracownicy" />
+        <Member Name="EstimatedWorkHours" Caption="Szacowane godziny pracy" />
+        <Member Name="Priority" Caption="Priorytet" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MainDemo.Module.BusinessObjects.Department" Caption="Dział">
+      <OwnMembers>
+        <Member Name="DepartmentHead" Caption="Kierownik działu" />
+        <Member Name="Description" Caption="Opis" />
+        <Member Name="Employees" Caption="Pracownicy" />
+        <Member Name="Location" Caption="Lokalizacja" />
+        <Member Name="NumberOfEmployees" Caption="Liczba pracowników" />
+        <Member Name="Office" Caption="Biuro" />
+        <Member Name="Positions" Caption="Stanowiska" />
+        <Member Name="Title" Caption="Nazwa" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MainDemo.Module.BusinessObjects.Employee" Caption="Pracownik">
+      <OwnMembers>
+        <Member Name="Address1" Caption="Adres prywatny" />
+        <Member Name="Address2" Caption="Adres służbowy" />
+        <Member Name="Anniversary" Caption="Rocznica" />
+        <Member Name="Birthday" Caption="Data urodzenia" />
+        <Member Name="ChangeHistory" Caption="Historia zmian" />
+        <Member Name="Department" Caption="Dział" />
+        <Member Name="FirstName" Caption="Imię" />
+        <Member Name="FullName" Caption="Imię i nazwisko" />
+        <Member Name="LastName" Caption="Nazwisko" />
+        <Member Name="Location" Caption="Lokalizacja" />
+        <Member Name="Manager" Caption="Przełożony" />
+        <Member Name="MiddleName" Caption="Drugie imię" />
+        <Member Name="NickName" Caption="Pseudonim" />
+        <Member Name="Notes" Caption="Notatki" />
+        <Member Name="PhoneNumbers" Caption="Numery telefonu" />
+        <Member Name="Photo" Caption="Zdjęcie" />
+        <Member Name="Position" Caption="Stanowisko" />
+        <Member Name="SpouseName" Caption="Imię małżonka" />
+        <Member Name="Tasks" Caption="Zadania" />
+        <Member Name="TitleOfCourtesy" Caption="Forma grzecznościowa" />
+        <Member Name="WebPageAddress" Caption="Strona WWW" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MainDemo.Module.BusinessObjects.Location" Caption="Lokalizacja">
+      <OwnMembers>
+        <Member Name="Latitude" Caption="Szerokość geograficzna" />
+        <Member Name="Longitude" Caption="Długość geograficzna" />
+        <Member Name="Title" Caption="Nazwa" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MainDemo.Module.BusinessObjects.Note" Caption="Notatka">
+      <OwnMembers>
+        <Member Name="DateTime" Caption="Data i czas" />
+        <Member Name="Text" Caption="Treść" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MainDemo.Module.BusinessObjects.Paycheck" Caption="Wypłata">
+      <OwnMembers>
+        <Member Name="Employee" Caption="Pracownik" />
+        <Member Name="GrossPay" Caption="Kwota brutto" />
+        <Member Name="Hours" Caption="Godziny" />
+        <Member Name="NetPay" Caption="Kwota netto" />
+        <Member Name="Notes" Caption="Uwagi" />
+        <Member Name="OvertimeHours" Caption="Nadgodziny" />
+        <Member Name="OvertimePayRate" Caption="Stawka za nadgodziny" />
+        <Member Name="PaymentDate" Caption="Data wypłaty" />
+        <Member Name="PayPeriod" Caption="Okres rozliczeniowy" />
+        <Member Name="PayPeriodEnd" Caption="Koniec okresu" />
+        <Member Name="PayPeriodStart" Caption="Początek okresu" />
+        <Member Name="PayRate" Caption="Stawka" />
+        <Member Name="TaxRate" Caption="Stawka podatku" />
+        <Member Name="TotalTax" Caption="Łączny podatek" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MainDemo.Module.BusinessObjects.PhoneNumber" Caption="Numer telefonu">
+      <OwnMembers>
+        <Member Name="Employee" Caption="Pracownik" />
+        <Member Name="Number" Caption="Numer" />
+        <Member Name="PhoneType" Caption="Typ telefonu" />
+      </OwnMembers>
+    </Class>
+  </BOModel>
+  <Localization>
+    <LocalizationGroup Name="Paycheck" IsNewNode="True">
+      <LocalizationItem Name="ChartLabel" Value="Miesięczny harmonogram wynagrodzeń" IsNewNode="True" />
+    </LocalizationGroup>
+  </Localization>
+  <Views>
+    <ListView Id="Employee_ListView" Caption="Pracownicy" />
+    <ListView Id="Department_ListView" Caption="Działy" />
+    <ListView Id="DemoTask_ListView" Caption="Zadania" />
+    <ListView Id="Note_ListView" Caption="Notatki" />
+    <ListView Id="Paycheck_ListView" Caption="Wypłaty" />
+    <ListView Id="Paycheck_ListView_Varied" Caption="Wypłaty">
+      <Variants>
+        <Variant Id="Default" Caption="Widok siatki" IsNewNode="True" />
+        <Variant Id="Chart" Caption="Widok wykresu" IsNewNode="True" />
+      </Variants>
+    </ListView>
+  </Views>
+</Application>

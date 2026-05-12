@@ -75,6 +75,9 @@
     <EmbeddedResource Include="Model.DesignedDiffs.Localization.de.xafml">
       <DependentUpon>Model.DesignedDiffs.xafml</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Model.DesignedDiffs.Localization.pl.xafml">
+      <DependentUpon>Model.DesignedDiffs.xafml</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" />

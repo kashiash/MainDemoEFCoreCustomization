@@ -1,4 +1,5 @@
-﻿using DevExpress.Data.Filtering;
+using System.Globalization;
+using DevExpress.Data.Filtering;
 using DevExpress.Xpo;
 using DevExpress.XtraPrinting;
 using MainDemo.Module.BusinessObjects;
@@ -19,7 +20,7 @@ public class ReportTests : BaseWebApiTest {
         await WebApiClient.AuthenticateAsync(userName, "");
         string url = CreateRequestUrl(reportName, null, null, null, ExportTarget.Csv);
 
-        string currentData = DateTime.Now.ToShortDateString();
+        string currentData = DateTime.Now.ToString("d", CultureInfo.GetCultureInfo("en-US"));
         string newLine = Environment.NewLine;
         string expectedResult =
             $"Employees,,,,{newLine}" +
@@ -100,7 +101,7 @@ public class ReportTests : BaseWebApiTest {
         string criteria = CriteriaOperator.FromLambda<Employee>(x => x.FirstName == "Aaron" || x.LastName == "Benson").ToString();
         string url = CreateRequestUrl(reportName, criteria, null, null, ExportTarget.Csv);
 
-        string currentData = DateTime.Now.ToShortDateString();
+        string currentData = DateTime.Now.ToString("d", CultureInfo.GetCultureInfo("en-US"));
         string newLine = Environment.NewLine;
         string expectedResult =
             $"Employees,,,,{newLine}" +
@@ -113,7 +114,9 @@ public class ReportTests : BaseWebApiTest {
     }
 
     private async System.Threading.Tasks.Task LoadReportAndCompare(string userName, string url, string expectedResult) {
-        var response = await WebApiClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, url));
+        var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.Add("Accept-Language", "en-US");
+        var response = await WebApiClient.SendAsync(request);
         Assert.True(response.IsSuccessStatusCode, $"Request failed for {userName} @ {url} ");
 
         string loadedReport = await response.Content.ReadAsStringAsync();
