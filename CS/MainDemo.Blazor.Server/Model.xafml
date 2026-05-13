@@ -23,7 +23,9 @@
          RestoreTabbedMdiLayout="True"
          ShowTabImage="True"
          FormStyle="Ribbon"
-         VirtualScrollingEnabled="True">
+         VirtualScrollingEnabled="True"
+         BlockDateEditMouseWheelByDefault="True"
+         DateEditMaskCaretMode="Advancing">
   </Options>
 	<NavigationItems>
 		<Items>

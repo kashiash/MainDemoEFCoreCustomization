@@ -12,6 +12,7 @@ using DevExpress.Persistent.Base;
 using DevExpress.Persistent.BaseImpl.EF;
 using DevExpress.Persistent.BaseImpl.EFCore.AuditTrail;
 using DevExpress.Persistent.Validation;
+using MainDemo.Module.Editors;
 
 namespace MainDemo.Module.BusinessObjects;
 
@@ -31,7 +32,7 @@ public class Employee : BaseObject {
 
     public virtual String MiddleName { get; set; }
 
-    [EditorAlias("DateEditorNullable")]
+    [DateEditMouseWheel(false)]
     public virtual DateTime? Birthday { get; set; }
 
     [FieldSize(255)]

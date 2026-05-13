@@ -52,6 +52,7 @@
     <Compile Include="CodeRules\**\*.cs" />
     <Compile Include="Controllers\**\*.cs" />
     <Compile Include="DatabaseUpdate\**\*.cs" />
+    <Compile Include="Editors\**\*.cs" />
     <Compile Include="Properties\**\*.cs" />
     <Compile Include="Reports\**\*.cs" />
     <Compile Include="DemoDbEngineDetectorHelper.cs" />

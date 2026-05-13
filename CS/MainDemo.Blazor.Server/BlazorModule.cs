@@ -3,7 +3,7 @@ using DevExpress.ExpressApp.DC;
 using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.BaseImpl.EF;
 using MainDemo.Blazor.Server.Controllers;
-using MainDemo.Blazor.Server.Editors;
+using MainDemo.Blazor.Server.Editors.Date;
 
 namespace MainDemo.Blazor.Server;
 
@@ -42,6 +42,7 @@ public sealed class MainDemoBlazorModule : ModuleBase {
 
     public override void ExtendModelInterfaces(ModelInterfaceExtenders extenders) {
         base.ExtendModelInterfaces(extenders);
+        extenders.Add<IModelOptions, IModelOptionsDateEditMouseWheel>();
         extenders.Add<IModelMemberViewItem, IModelMemberViewItemMouseWheel>();
     }
 }
