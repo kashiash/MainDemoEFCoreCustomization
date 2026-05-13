@@ -1,5 +1,12 @@
 window.ReportingLocalization = {
     currentCulture: null,
+    loadMergedMessages: function (baseUrl, overrideUrl) {
+        return $.get(baseUrl).then(baseMessages => {
+            return $.get(overrideUrl)
+                .then(overrideMessages => $.extend(true, {}, baseMessages, overrideMessages))
+                .catch(() => baseMessages);
+        });
+    },
     resolveLocalizationCulture: function (culture) {
         if (!culture) {
             return null;
@@ -21,9 +28,22 @@ window.ReportingLocalization = {
     onCustomizeLocalization: function (_, e) {
         const currentCulture = window.ReportingLocalization.resolveLocalizationCulture(window.ReportingLocalization.currentCulture);
         if (currentCulture) {
-            e.LoadMessages($.get("js/localization/dx-analytics-core." + currentCulture + ".json"));
-            e.LoadMessages($.get("js/localization/dx-reporting." + currentCulture + ".json"));
-            $.get("js/localization/" + currentCulture + ".json").done(result => {
+            const analyticsMessages = window.ReportingLocalization.loadMergedMessages(
+                "js/localization/dx-analytics-core." + currentCulture + ".json",
+                "js/localization/overrides/dx-analytics-core." + currentCulture + ".json"
+            );
+            const reportingMessages = window.ReportingLocalization.loadMergedMessages(
+                "js/localization/dx-reporting." + currentCulture + ".json",
+                "js/localization/overrides/dx-reporting." + currentCulture + ".json"
+            );
+            const widgetMessages = window.ReportingLocalization.loadMergedMessages(
+                "js/localization/" + currentCulture + ".json",
+                "js/localization/overrides/" + currentCulture + ".json"
+            );
+
+            e.LoadMessages(analyticsMessages);
+            e.LoadMessages(reportingMessages);
+            widgetMessages.done(result => {
                 e.WidgetLocalization.loadMessages(result);
             }).always(() => {
                 e.WidgetLocalization.locale(currentCulture);
