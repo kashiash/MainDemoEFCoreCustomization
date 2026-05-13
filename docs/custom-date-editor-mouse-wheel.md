@@ -1,6 +1,6 @@
-# Custom DateEditor z parametrem modelowym do blokady kółka myszy
+# Custom DateEditor z blokadą kółka myszy i konfigurowalnym caret mode
 
-Ten dokument opisuje konkretną zmianę, którą zrobiłem w `MainDemo.NET.EFCore`. Pattern wzięty 1:1 z `HIS.Blazor.Server\Editors\DateEditor.cs`, ale rozszerzony o jedną rzecz, której w HIS nie ma: **opt-out z poziomu Model Editora XAF** dla pojedynczego pola. Czyli developer nie musi grzebać w kodzie, żeby na danej kolumnie wyłączyć blokadę kółka, jak akurat ją gdzieś chce.
+Ten dokument opisuje custom property editor dla pól typu `DateTime` / `DateTime?` w `MainDemo.Blazor.Server`. Editor robi dwie rzeczy: **blokuje scroll kółka myszy** od zmieniania wartości daty oraz **konfiguruje `MaskCaretMode`** tak, żeby kursor sam przeskakiwał między sekcjami maski. Obie konfiguracje są sterowane z poziomu Model Editora XAF i atrybutami na property.
 
 ## Po co to wszystko
 
@@ -10,203 +10,179 @@ Drugi temat — `MaskCaretMode`. DevExpress domyślnie ma `Static` (kursor stoi 
 
 Te dwa fixy chodzą zawsze razem.
 
-## Co jest w repo po tej zmianie
+## Struktura plików
 
-### Plik 1: `CS\MainDemo.Blazor.Server\Editors\DateEditor.cs`
+Edytor jest rozbity tematycznie — po wzorcu z `OutlookInspiredDemo/DataDrive.Blazor.Server/Editors/`, każda odpowiedzialność w osobnym pliku.
 
-Cały plik, jeden custom editor dla `DateTime`, drugi dla `DateTime?` (XAF property editory są typo-specyficzne — nullable to oddzielna klasa). Plus statyczne stałe aliasów i interfejs rozszerzający Model Editor XAF-a.
+### `MainDemo.Module` — części reusable między platformami
 
-Stałe i interfejs modelu:
+- `CS\MainDemo.Module\Editors\EditorAliases.cs` — stałe stringowe nazwy aliasów editorów. Trzymane w Module, żeby business objecty mogły referować je przez `[EditorAlias(EditorAliases.MainDemoDateTimeEditor)]` zamiast hardkodować literał.
+- `CS\MainDemo.Module\Editors\DateEditMouseWheelAttribute.cs` — atrybut deklaratywny do nakładania na pojedyncze property. Nie zależy od żadnego typu UI, więc bezpiecznie żyje w Module.
+
+### `MainDemo.Blazor.Server` — części UI-specyficzne
+
+- `CS\MainDemo.Blazor.Server\Editors\Date\MainDemoDateTimeEditor.cs` — editor dla `DateTime`.
+- `CS\MainDemo.Blazor.Server\Editors\Date\MainDemoNullableDateTimeEditor.cs` — editor dla `DateTime?` (XAF property editory są typo-specyficzne, nullable to oddzielna klasa).
+- `CS\MainDemo.Blazor.Server\Editors\Date\MainDemoDateTimeEditorConfigurator.cs` — wspólna logika obu editorów: parsowanie formatu/maski, wykrywanie sekcji czasu, doczepianie CSS-class blokady kółka.
+- `CS\MainDemo.Blazor.Server\Editors\Date\IModelOptionsDateEditMouseWheel.cs` — interfejs rozszerzający globalne `IModelOptions` w Application Model XAF: `BlockDateEditMouseWheelByDefault` i `DateEditMaskCaretMode`.
+- `CS\MainDemo.Blazor.Server\Editors\Date\IModelMemberViewItemMouseWheel.cs` — interfejs rozszerzający `IModelMemberViewItem`: nullable `BlockMouseWheel` dla pojedynczego pola.
+- `CS\MainDemo.Blazor.Server\Editors\Date\DateEditorCssAliases.cs` — stałe nazw CSS class używanych przez editor i konsumowanych przez JS-marker.
+- `CS\MainDemo.Blazor.Server\Editors\Date\DateEditMouseWheelGuardController.cs` — kontroler XAF, który przy każdym widoku ładuje JS-moduł blokujący scroll i rejestruje globalny listener.
+- `CS\MainDemo.Blazor.Server\wwwroot\js\maindemo-date-edit-wheel-guard.js` — moduł ES z idempotentnym `ensureRegistered()`, który dorzuca jeden `wheel` listener w capture phase.
+
+## Trzy poziomy konfiguracji blokady kółka
+
+Konfigurator sprawdza kolejno (pierwsza znaleziona wartość wygrywa):
+
+1. **Atrybut na property** — `[DateEditMouseWheel(false)]` na konkretnym property w business objectcie wyłącza blokadę dla tego pola. To opcja dla developera, który wie z góry, że dane pole ma być scrollowalne.
+2. **`IModelMemberViewItemMouseWheel.BlockMouseWheel`** — nullable bool ustawiany w Model Editor per ViewItem. Pozwala wyłączyć blokadę dla konkretnego pola w konkretnym widoku bez dotykania kodu. Wartość `null` oznacza „spadnij do poziomu globalnego".
+3. **`IModelOptionsDateEditMouseWheel.BlockDateEditMouseWheelByDefault`** — globalna wartość domyślna dla całej aplikacji. Default `true`, bo zazwyczaj chcemy blokować.
+
+Jeśli żaden poziom nic nie ustawi, blokada jest włączona.
+
+## `MaskCaretMode`
+
+Konfiguracja na poziomie globalnym przez `IModelOptionsDateEditMouseWheel.DateEditMaskCaretMode`. Default `Advancing`. Ustawiana w `DxDateEditMaskProperties.{DateTime,DateOnly,DateTimeOffset}.CaretMode` przy każdym tworzeniu kontrolki — **uwaga: to globalny statyczny stan DevExpress**. Dziś źródłem jest jeden interfejs `IModelOptions`, więc nieszkodliwe; gdyby kiedyś trzeba było per-View, ostatnio otwarty widok wygra dla wszystkich.
+
+## Wykrywanie sekcji czasu z formatu
+
+`MainDemoDateTimeEditorConfigurator.IncludesTimeSection(format)` parsuje `EditMask` / `DisplayFormat` z modelu, usuwa cytowane literały (`'r.'`, `"r."`, escapowane znaki), i sprawdza czy w pozostałych tokenach jest jeden z: `H h s t f F K z` lub samodzielne `m` w masce dłuższej niż 1 znak. Standardowe formaty `f F g G o O r R s t T u U` traktuje jako mające czas. To pozwala editorowi automatycznie włączać `TimeSectionVisible` tylko dla pól z czasem, niezależnie od tego czy w xafml siedzi `DisplayFormat="dd.MM.yyyy HH:mm"`, czy `EditMask="g"`.
+
+## Rejestracja w `BlazorModule`
+
+XAF nie zobaczy interfejsów modelu, dopóki nie zarejestrujemy ich w `ExtendModelInterfaces`:
 
 ```csharp
-public static class CustomEditorAliases {
-    public const string DateEditor = "DateEditor";
-    public const string DateEditorNullable = "DateEditorNullable";
-    public const string MouseWheelBlockerCssClass = "maindemo-wheel-blocked";
-}
-
-public interface IModelMemberViewItemMouseWheel : IModelMemberViewItem {
-    [Category("Behavior")]
-    [Description("When true, scrolling the mouse wheel inside this date editor will not change the value.")]
-    [DefaultValue(true)]
-    bool BlockMouseWheel { get; set; }
+public override void ExtendModelInterfaces(ModelInterfaceExtenders extenders) {
+    base.ExtendModelInterfaces(extenders);
+    extenders.Add<IModelOptions, IModelOptionsDateEditMouseWheel>();
+    extenders.Add<IModelMemberViewItem, IModelMemberViewItemMouseWheel>();
 }
 ```
 
-Sam editor (skrócony — dla nullable wygląda identycznie z `DxDateEditModel<DateTime?>`):
+Po tym Application Model dostaje na `Application.Options` dwa nowe property (sekcja `Behavior`), a każdy `IModelMemberViewItem` dostaje `BlockMouseWheel`.
 
-```csharp
-[PropertyEditor(typeof(DateTime), CustomEditorAliases.DateEditor, false)]
-public class DateEditor(Type objectType, IModelMemberViewItem model) : DateTimePropertyEditor(objectType, model) {
-    protected override void OnControlCreated() {
-        base.OnControlCreated();
-        if (Control is DxDateEditModel<DateTime> adapter) {
-            DxDateEditMaskProperties.DateTime.CaretMode = MaskCaretMode.Advancing;
-            DxDateEditMaskProperties.DateOnly.CaretMode = MaskCaretMode.Advancing;
-            DxDateEditMaskProperties.DateTimeOffset.CaretMode = MaskCaretMode.Advancing;
+## Blokada kółka po stronie JS
 
-            adapter.Format = "dd.MM.yyyy";
-            adapter.DisplayFormat = "dd.MM.yyyy";
-            adapter.Mask = "dd.MM.yyyy";
-            ApplyMouseWheelBlocker(adapter);
-            adapter.Buttons = CreateButton();
-        }
-    }
-
-    void ApplyMouseWheelBlocker<T>(DxDateEditModel<T> adapter) {
-        if (Model is IModelMemberViewItemMouseWheel m && !m.BlockMouseWheel) {
-            return;
-        }
-        adapter.CssClass = string.IsNullOrEmpty(adapter.CssClass)
-            ? CustomEditorAliases.MouseWheelBlockerCssClass
-            : adapter.CssClass + " " + CustomEditorAliases.MouseWheelBlockerCssClass;
-    }
-    // CreateViewComponentCore + CreateButton — patrz pełen plik
-}
-```
-
-Punkty wymagające uwagi:
-
-- `isDefaultEditor: false` w `[PropertyEditor]` — to jest **świadoma decyzja**. Edytor jest dostępny pod aliasem, ale nie nadpisuje globalnie `DateTimePropertyEditor` dla wszystkich `DateTime` w aplikacji. Włącza się go per pole atrybutem `[EditorAlias]`.
-- `DxDateEditMaskProperties.{DateTime,DateOnly,DateTimeOffset}.CaretMode` to są **statyczne globalne** w DevExpress Blazor. Ustawienie ich w `OnControlCreated` per instancja jest redundantne — wystarczyłoby raz przy starcie aplikacji w `Program.cs`. Zostawiłem jak w HIS, bo nie szkodzi i pattern jest spójny. Jak ktoś będzie miał ochotę posprzątać, można to wyciąć i przerzucić do `BlazorModule.Setup` albo `Program.Main`.
-- `ApplyMouseWheelBlocker` doczepia CSS klasę `maindemo-wheel-blocked` do root-a kontrolki przez `adapter.CssClass`. **Tylko** gdy `Model.BlockMouseWheel == true`. Jeśli developer w Model Editor ustawi `BlockMouseWheel = False` dla konkretnego pola, klasa nie zostanie dodana i kółko działa normalnie.
-
-### Plik 2: `CS\MainDemo.Blazor.Server\wwwroot\js\disable-wheel-on-editors.js`
+`maindemo-date-edit-wheel-guard.js` rejestruje **jeden** listener globalny w capture phase:
 
 ```javascript
-(function () {
-    document.addEventListener('wheel', function (e) {
-        var t = e.target;
-        if (t && typeof t.closest === 'function' && t.closest('.maindemo-wheel-blocked')) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-        }
-    }, { capture: true, passive: false });
-})();
+document.addEventListener('wheel', function (e) {
+    const target = e.target;
+    if (!target || typeof target.closest !== 'function') return;
+    if (target.closest('.maindemo-dateedit-wheel-allowed')) return;
+    if (target.closest('.maindemo-dateedit-wheel-blocked')) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+    }
+}, { capture: true, passive: false });
 ```
 
 Kluczowe parametry:
 
 - `capture: true` — listener łapie zdarzenie **przed** DevExpress, w fazie capture. Bez tego DevExpress dostaje wheel pierwszy i zmienia wartość zanim my zdążymy `preventDefault`.
 - `passive: false` — nowoczesne przeglądarki domyślnie traktują `wheel` jako passive (`preventDefault` jest ignorowane). Trzeba jawnie wymusić non-passive.
-- `stopImmediatePropagation()` — zatrzymuje też inne listenery na tym samym elemencie (w tym potencjalne wewnętrzne `wheel` DevExpressa zarejestrowane też w capture).
-- Selektor `.maindemo-wheel-blocked` — celuje wyłącznie w nasz marker. Niezależny od wewnętrznych klas DevExpress (`dxbl-dateedit` itp.), które się zmieniają między wersjami.
+- `stopImmediatePropagation()` — zatrzymuje też inne listenery na tym samym elemencie.
+- Selektory `.maindemo-dateedit-wheel-allowed` / `.maindemo-dateedit-wheel-blocked` — celują wyłącznie w nasze markery. Niezależne od wewnętrznych klas DevExpress (`dxbl-dateedit` itp.), które się zmieniają między wersjami.
 
-### Plik 3: `CS\MainDemo.Blazor.Server\Pages\_Host.cshtml`
-
-Po `js/scripts.js`, przed zamknięciem `</body>`:
-
-```html
-<script src="js/disable-wheel-on-editors.js"></script>
-```
-
-Kolejność ma znaczenie — `_framework/blazor.server.js` musi być pierwszy.
-
-### Plik 4: `CS\MainDemo.Blazor.Server\BlazorModule.cs`
-
-XAF nie zobaczy `IModelMemberViewItemMouseWheel` w Model Editorze, dopóki nie zarejestrujemy interfejsu jako rozszerzenia bazowego `IModelMemberViewItem`:
-
-```csharp
-public override void ExtendModelInterfaces(ModelInterfaceExtenders extenders) {
-    base.ExtendModelInterfaces(extenders);
-    extenders.Add<IModelMemberViewItem, IModelMemberViewItemMouseWheel>();
-}
-```
-
-Po tym kroku każdy `ViewItem` modelu typu `IModelMemberViewItem` dostaje w Application Model property `BlockMouseWheel` (sekcja `Behavior`, default `True`).
-
-### Plik 5: `CS\MainDemo.Blazor.Server\MainDemo.Blazor.Server.csproj`
-
-`EnableDefaultItems` jest tu `false`, więc dorzucenie pliku `.cs` w `Editors\` wymaga jawnego wpisu:
-
-```xml
-<Compile Include="Editors\DateEditor.cs" />
-```
-
-### Plik 6: Business objects z `[EditorAlias]`
-
-Włączenie edytora na konkretnych polach. Trzy w `DemoTask.cs`:
-
-```csharp
-[EditorAlias("DateEditorNullable")]
-public virtual DateTime? DateCompleted { get; set; }
-
-[EditorAlias("DateEditorNullable")]
-public virtual DateTime? DueDate { get; set; }
-
-[EditorAlias("DateEditorNullable")]
-public virtual DateTime? StartDate { get; set; }
-```
-
-Jeden w `Employee.cs`:
-
-```csharp
-[EditorAlias("DateEditorNullable")]
-public virtual DateTime? Birthday { get; set; }
-```
+Moduł jest ładowany przez kontroler `DateEditMouseWheelGuardController` przez `IJSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/maindemo-date-edit-wheel-guard.js")` na każdym widoku. Funkcja `ensureRegistered()` jest idempotentna — kolejne wywołania są no-op, listener rejestrowany tylko raz. Dzięki temu nie ma `<script>` taga w `_Host.cshtml` (kiedyś było, ale wymagało dodatkowej koordynacji kolejności względem `blazor.server.js`).
 
 ## Jak to działa razem
 
-1. Developer dodaje `[EditorAlias("DateEditorNullable")]` na property `DateTime?` w jakiejś klasie biznesowej.
-2. XAF buduje View Item i zamiast wbudowanego `DateTimePropertyEditor` instancjonuje nasze `DateEditorNullable`.
-3. `OnControlCreated` ustawia maskę `dd.MM.yyyy`, `MaskCaretMode.Advancing`, ikonę zegara (klik = `DateTime.Now`).
-4. `ApplyMouseWheelBlocker` patrzy w model: jeśli `Model.BlockMouseWheel == true` (default), dorzuca klasę CSS `maindemo-wheel-blocked` do roota kontrolki.
-5. Globalny listener z `disable-wheel-on-editors.js` łapie wheel w capture phase. Jak target jest pod elementem z `.maindemo-wheel-blocked`, robi `preventDefault` + `stopImmediatePropagation`.
-6. DevExpress nie dostaje już wheel-a, wartość się nie zmienia.
+1. Developer dodaje pole `DateTime?` w klasie biznesowej. Edytor `MainDemoDateTimeEditor` jest zarejestrowany jako `isDefaultEditor: true`, więc XAF używa go automatycznie dla wszystkich `DateTime` / `DateTime?` bez potrzeby `[EditorAlias]`.
+2. `OnControlCreated` ustawia `MaskCaretMode` (globalnie) i wywołuje `Configurator.Configure(adapter, Model)`.
+3. Configurator parsuje `EditMask` / `DisplayFormat` z modelu, ustawia `Mask` / `Format` / `DisplayFormat` na adapterze, decyduje o `TimeSectionVisible` i doczepia odpowiednią klasę CSS (`maindemo-dateedit-wheel-blocked` albo `maindemo-dateedit-wheel-allowed`) do `CssClass` i `InputCssClass`.
+4. `DateEditMouseWheelGuardController` na `OnViewControlsCreated` woła `ensureRegistered()` z modułu JS. Listener globalny jest rejestrowany raz na sesję.
+5. Użytkownik scrolluje. Listener sprawdza, czy target jest pod elementem z `.maindemo-dateedit-wheel-blocked` (i nie pod `-allowed` — gdyby kiedyś trzeba było zagnieżdżone wyjątki). Jeśli tak, robi `preventDefault` + `stopImmediatePropagation`.
+6. DevExpress nie dostaje wheel-a, wartość się nie zmienia.
 
-## Jak developer dezaktywuje blokadę kółka dla jednego pola
+## Jak developer wyłącza blokadę dla jednego pola
 
-Zero zmian w kodzie. W Model Editor:
+Trzy opcje, w kolejności od najbardziej do najmniej trwałej:
+
+**Atrybutem na property:**
+
+```csharp
+[DateEditMouseWheel(false)]
+public virtual DateTime? KiedyZrobione { get; set; }
+```
+
+**Z Model Editora (per ViewItem):**
 
 ```
 Application Model → Views → DemoTask_DetailView → Items → DueDate
    Property: BlockMouseWheel = False
 ```
 
-Zapis `Model.xafml` zostaje przy projekcie albo per użytkownik (`Model.User.xafml`) — zależy gdzie wchodzisz w editor. Po reloadzie aplikacji to konkretne pole znów reaguje na scroll, reszta zostaje zablokowana.
+**Globalnie dla całej aplikacji:**
 
-## Jak developer dodaje custom DateEditor do swojego pola
-
-Pole `DateTime?`:
-
-```csharp
-[EditorAlias("DateEditorNullable")]
-public virtual DateTime? KiedyZrobione { get; set; }
+```
+Application Model → Options
+   Property: BlockDateEditMouseWheelByDefault = False
 ```
 
-Pole `DateTime` (non-nullable):
+### Żywy przykład: `Employee.Birthday`
+
+W tym projekcie pole `Employee.Birthday` ma świadomie odblokowany scroll. Powód: data urodzenia to często edycja „cofnij o kilka lat" — wygodniej przewinąć rok kółkiem niż wpisywać go ręcznie. Pozostałe pola daty w aplikacji (np. `DemoTask.DueDate`, `DemoTask.StartDate`) zostają zablokowane, bo to typowo „dziś plus parę dni" i scroll przeszkadza.
+
+Zrobione zostało wariantem atrybutowym — wybór nie jest case-by-case decyzją operatora, tylko świadomą decyzją modelu domenowego, więc lepiej trzymać ją w kodzie niż w xafml:
 
 ```csharp
-[EditorAlias("DateEditor")]
-public virtual DateTime CzasUtworzenia { get; set; }
+// CS\MainDemo.Module\BusinessObjects\Employee.cs
+using MainDemo.Module.Editors;
+
+// ...
+
+[DateEditMouseWheel(false)]
+public virtual DateTime? Birthday { get; set; }
 ```
 
-To wszystko. Caret mode i blokada kółka działają automatycznie z domyślnymi ustawieniami.
+Po stronie UI editor automatycznie podpina klasę CSS `maindemo-dateedit-wheel-allowed` zamiast `-blocked` do tej konkretnej kontrolki. Globalny listener wheel widzi `.maindemo-dateedit-wheel-allowed`, robi `return` przed czekiem na `.maindemo-dateedit-wheel-blocked`, i scroll przelatuje do DevExpressa normalnie. Reszta pól daty w widoku detail (`Anniversary` w tym samym widoku, daty w `Tasks` itp.) pozostaje zablokowana, bo nie mają tego atrybutu.
 
-## Dlaczego ten wariant, a nie inny
+Weryfikacja w przeglądarce: F12 → Elements → znajdź input daty urodzenia → potwierdź, że ma klasę `maindemo-dateedit-wheel-allowed` (a nie `-blocked`). W konsoli:
 
-Rozważałem trzy:
+```javascript
+document.querySelectorAll('.maindemo-dateedit-wheel-allowed').length
+```
 
-1. **Globalny JS po klasach DevExpress** (`.dxbl-dateedit, .dxbl-timeedit`) — zacząłem od tego. Nie zadziałało. Klasy DevExpressa w v25.2 są inne niż w v24, a poza tym DevExpress łapie `wheel` w capture phase, więc bubble-listener przyszedł za późno. Naprawiać dwa razy nie chciałem.
-2. **JSInterop per editor w `OnControlCreated`** — czyste C#-side, ale daje koszt per instancja kontrolki (resolve IJSRuntime, await invocation) i nie da się tego zrobić w XAF property editor bez ręcznego pobierania serwisu z `Application.ServiceProvider`. Nadmiernie skomplikowane.
-3. **Marker CSS + globalny JS targetujący tylko ten marker** ← wybrałem to. Listener jest jeden, w capture phase, działa niezależnie od DevExpressa, a opt-out wisi w modelu, nie w kodzie.
+powinno zwrócić ≥ 1 na widoku z polem `Birthday`.
 
-Wariant 3 ma jeden minus: jeśli ktoś usunie plik JS, blokada przestaje działać i nie ma żadnego sygnału. Asercja w `_Host.cshtml` że ten skrypt jest, plus convention test, to opcjonalne ulepszenia.
+Gdyby decyzja była bardziej kontekstowa — np. „w widoku rekrutera scroll na Birthday OK, w widoku HR-owca nie" — wtedy lepszy byłby wariant z Model Editora per ViewItem, bo różne widoki tej samej klasy mogą wpisać różne `BlockMouseWheel`. Atrybut na property dotyczy wszystkich widoków jednakowo, model jest twardszy niż xafml.
 
 ## Pułapki
 
-- **Nie zapomnij o `ExtendModelInterfaces`**. Bez rejestracji w `BlazorModule` interfejs `IModelMemberViewItemMouseWheel` istnieje, ale Model Editor go nie zobaczy. Wszystkie pola będą blokować kółko (default `true` w interfejsie) i nie ma jak tego wyłączyć z modelu, tylko z kodu.
-- **`EnableDefaultItems=false` w csproj**. Każdy nowy `.cs` musi być dorzucony do `<Compile Include>`. Łatwo zgubić ten krok, bo Visual Studio dorzuca to automatycznie tylko w projektach z domyślnymi itemami.
+- **Nie zapomnij o `ExtendModelInterfaces`**. Bez rejestracji w `BlazorModule` interfejsy istnieją, ale Model Editor ich nie zobaczy. Wszystkie pola będą blokować kółko (default `true`) i nie ma jak tego wyłączyć z modelu, tylko z kodu (atrybutem).
+- **`EnableDefaultItems=false` w obu csproj**. Każdy nowy `.cs` musi być dorzucony do `<Compile Include>`. W `MainDemo.Module.csproj` jest glob `<Compile Include="Editors\**\*.cs" />`. W `MainDemo.Blazor.Server.csproj` jest glob `<Compile Include="Editors\Date\**\*.cs" />`. Dorzucanie kolejnych editorów do tych podfolderów działa automatycznie; nowy folder na poziomie `Editors\` wymaga osobnego wpisu.
 - **`{ passive: false }` musi być jawnie**. Bez tego `preventDefault` jest cicho zignorowane i wartość się dalej zmienia.
 - **`capture: true` ma znaczenie**. Bez tego DevExpress czyta wheel pierwszy.
-- **`MaskCaretMode.Advancing` jest globalny dla aplikacji**. Ustawienie go w `OnControlCreated` per kontrolka działa, ale nadpisuje wartość dla **wszystkich** `DxDateEdit` w aplikacji, też tych nie używających naszego editora. Jeśli ktoś chce mieć `Static` gdzieś indziej — trzeba przerzucić to do `Program.cs` i jawnie zdecydować na poziomie aplikacji.
+- **`DxDateEditMaskProperties.*.CaretMode` to globalny stan DevExpress**. Ustawienie go w `OnControlCreated` per kontrolka działa, ale nadpisuje wartość dla **wszystkich** `DxDateEdit` w aplikacji. Dziś nieszkodliwe, bo źródłem jest jedna globalna wartość; gdyby kiedyś trzeba było per-View, trzeba to wyciągnąć z editora.
+- **Konflikt nazwy `EditorAliases`**. W DevExpress jest `DevExpress.ExpressApp.Editors.EditorAliases`. Nasza klasa `MainDemo.Module.Editors.EditorAliases` koliduje przez nazwę — używamy aliasu using `using EditorAliases = MainDemo.Module.Editors.EditorAliases;` po wzorcu z `OutlookInspiredDemo`.
 
-## Lista zmienionych plików
+## Jak dodać kolejny custom editor zgodny z tym pattern
 
-- `CS\MainDemo.Blazor.Server\Editors\DateEditor.cs` (nowy)
-- `CS\MainDemo.Blazor.Server\wwwroot\js\disable-wheel-on-editors.js` (nowy)
-- `CS\MainDemo.Blazor.Server\Pages\_Host.cshtml`
-- `CS\MainDemo.Blazor.Server\BlazorModule.cs`
-- `CS\MainDemo.Blazor.Server\MainDemo.Blazor.Server.csproj`
-- `CS\MainDemo.Module\BusinessObjects\DemoTask.cs`
-- `CS\MainDemo.Module\BusinessObjects\Employee.cs`
+1. Stałą aliasu (publiczny string-literał używany przez `[PropertyEditor]` i `[EditorAlias]`) dodaj do `CS\MainDemo.Module\Editors\EditorAliases.cs`. Wartość literału ustawia raz na zawsze — zmiana wymaga migracji wszystkich `Model.xafml`.
+2. Klasy edytora i ich helpery wkładaj do nowego folderu `CS\MainDemo.Blazor.Server\Editors\<Name>\`. Namespace `MainDemo.Blazor.Server.Editors.<Name>`.
+3. Atrybuty deklaratywne (bez zależności od UI) wrzucaj do `MainDemo.Module\Editors\`. Interfejsy modelu (`IModelOptions*`, `IModelMemberViewItem*`) zostawiaj w `Blazor.Server`, dopóki tylko Blazor je honoruje.
+4. Jeśli editor potrzebuje JS, używaj wzorca z `DateEditMouseWheelGuardController` — ładuj jako moduł ES przez `IJSRuntime`, funkcja `ensureRegistered()` idempotentna. Unikaj inline `<script>` w `_Host.cshtml`.
+5. Rejestruj rozszerzenia modelu w `BlazorModule.ExtendModelInterfaces` z usingiem na nowy namespace `MainDemo.Blazor.Server.Editors.<Name>`.
+
+## Lista plików
+
+**Powstałe przy tej zmianie / refaktorze (układ docelowy):**
+
+- `CS\MainDemo.Module\Editors\EditorAliases.cs`
+- `CS\MainDemo.Module\Editors\DateEditMouseWheelAttribute.cs`
+- `CS\MainDemo.Blazor.Server\Editors\Date\MainDemoDateTimeEditor.cs`
+- `CS\MainDemo.Blazor.Server\Editors\Date\MainDemoNullableDateTimeEditor.cs`
+- `CS\MainDemo.Blazor.Server\Editors\Date\MainDemoDateTimeEditorConfigurator.cs`
+- `CS\MainDemo.Blazor.Server\Editors\Date\IModelOptionsDateEditMouseWheel.cs`
+- `CS\MainDemo.Blazor.Server\Editors\Date\IModelMemberViewItemMouseWheel.cs`
+- `CS\MainDemo.Blazor.Server\Editors\Date\DateEditorCssAliases.cs`
+- `CS\MainDemo.Blazor.Server\Editors\Date\DateEditMouseWheelGuardController.cs`
+- `CS\MainDemo.Blazor.Server\wwwroot\js\maindemo-date-edit-wheel-guard.js`
+
+**Zmodyfikowane:**
+
+- `CS\MainDemo.Blazor.Server\BlazorModule.cs` — rejestracja rozszerzeń modelu
+- `CS\MainDemo.Blazor.Server\MainDemo.Blazor.Server.csproj` — glob `Editors\Date\**\*.cs`
+- `CS\MainDemo.Module\MainDemo.Module.csproj` — glob `Editors\**\*.cs`
