@@ -10,6 +10,108 @@ Drugi temat — `MaskCaretMode`. DevExpress domyślnie ma `Static` (kursor stoi 
 
 Te dwa fixy chodzą zawsze razem.
 
+## Wersja minimalna — wszystko na sztywno, bez konfiguracji
+
+Jeśli akceptujemy, że scroll będzie zablokowany **wszędzie** i `MaskCaretMode` ma być **zawsze** `Advancing`, bez żadnej możliwości wyjątku per pole czy per widok, do celu wystarczą **dwa pliki**: jeden `ViewController` po stronie C# i jeden plik JS po stronie przeglądarki. Bez własnego property editora, bez atrybutu, bez rozszerzania Application Model, bez `ExtendModelInterfaces`. To jest ten sam pomysł, który DevExpress dokumentuje pod hasłem „Customize a Built-in Property Editor" — kontroler zamiast subclass-owania.
+
+### Krok 1: kontroler ustawiający caret mode i CSS-classę
+
+Plik `CS\MainDemo.Blazor.Server\Controllers\GlobalDateEditorTweaksController.cs` (zwykły `ViewController<DetailView>`, XAF wykryje go automatycznie):
+
+```csharp
+using DevExpress.Blazor;
+using DevExpress.ExpressApp;
+using DevExpress.ExpressApp.Blazor.Components.Models;
+using DevExpress.ExpressApp.Editors;
+
+namespace MainDemo.Blazor.Server.Controllers;
+
+public class GlobalDateEditorTweaksController : ViewController<DetailView> {
+    protected override void OnActivated() {
+        base.OnActivated();
+        DxDateEditMaskProperties.DateTime.CaretMode = MaskCaretMode.Advancing;
+        DxDateEditMaskProperties.DateOnly.CaretMode = MaskCaretMode.Advancing;
+        DxDateEditMaskProperties.DateTimeOffset.CaretMode = MaskCaretMode.Advancing;
+    }
+
+    protected override void OnViewControlsCreated() {
+        base.OnViewControlsCreated();
+        foreach (var item in View.Items.OfType<PropertyEditor>()) {
+            Type t = item.MemberInfo.MemberType;
+            if (t == typeof(DateTime) && item.Control is DxDateEditModel<DateTime> a1) {
+                AppendCss(a1);
+            }
+            else if (t == typeof(DateTime?) && item.Control is DxDateEditModel<DateTime?> a2) {
+                AppendCss(a2);
+            }
+        }
+    }
+
+    static void AppendCss<T>(DxDateEditModel<T> adapter) {
+        const string cls = "maindemo-dateedit-wheel-blocked";
+        adapter.CssClass = string.IsNullOrEmpty(adapter.CssClass) ? cls : adapter.CssClass + " " + cls;
+        adapter.InputCssClass = string.IsNullOrEmpty(adapter.InputCssClass) ? cls : adapter.InputCssClass + " " + cls;
+    }
+}
+```
+
+Kontroler iteruje po wszystkich `PropertyEditor`-ach w `DetailView`, sprawdza, czy to pole typu `DateTime` lub `DateTime?`, i doczepia stałą CSS-class do adaptera DevExpress. Nie tworzy własnego editora, nie nadpisuje `[PropertyEditor]`, nie wymaga `[EditorAlias]` na business objectcie. Działa, bo XAF Blazor `DateTimePropertyEditor` używa pod spodem `DxDateEditModel<T>` jako adapter modelu komponentu — ten sam typ, do którego cast-uje docelowa wersja z `Editors/Date/`.
+
+### Krok 2: globalny listener JS
+
+W `CS\MainDemo.Blazor.Server\Pages\_Host.cshtml` po `_framework/blazor.server.js`:
+
+```html
+<script>
+(function () {
+    document.addEventListener('wheel', function (e) {
+        var t = e.target;
+        if (t && typeof t.closest === 'function' && t.closest('.maindemo-dateedit-wheel-blocked')) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        }
+    }, { capture: true, passive: false });
+})();
+</script>
+```
+
+Trzy kluczowe flagi: `capture: true` (listener łapie zdarzenie przed DevExpress), `passive: false` (`preventDefault` faktycznie działa), `stopImmediatePropagation()` (zatrzymuje też inne listenery na tym samym elemencie). Selektor `.maindemo-dateedit-wheel-blocked` celuje wyłącznie w nasz marker — niezależny od wewnętrznych klas DevExpress, które zmieniają się między wersjami.
+
+To wszystko. Dwa pliki, ~40 linii kodu razem, zero rejestracji modeli, zero atrybutów na business objectach. Build + run i wszystkie pola daty w aplikacji mają zablokowany scroll i `MaskCaretMode.Advancing`.
+
+### Czego ta wersja nie daje
+
+- **Nie ma wyjątków per pole.** Jeśli kiedyś jedno konkretne pole ma scrollować (np. data urodzenia, gdzie wygodniej cofnąć rok kółkiem), musimy albo zmienić kod, albo zrobić wyjątek dodając mu inną CSS-class z innego controllera. W obu wariantach jest to twarda zmiana w kodzie, nie konfiguracja.
+- **Nie ma wyjątków per widok.** Gdyby data urodzenia była scrollowalna w widoku rekrutacji, a zablokowana w HR, jednego controllera już nie wystarczy.
+- **Nie ma konfiguracji bez recompile.** Klient/operator nie wpłynie na zachowanie inaczej niż przez nowy build i deploy.
+- **Caret mode jest globalny.** `Advancing` dla wszystkich pól bez wyjątku. Gdyby ktoś chciał `Static` (np. dla pola gdzie maska jest niestandardowa), trzeba przerobić kontroler.
+- **`DxDateEditMaskProperties.*.CaretMode` to globalny statyczny stan DevExpress.** Ustawiamy go w `OnActivated` przy każdym widoku — redundantnie, ale nieszkodliwie. Jeśli kiedykolwiek chcielibyśmy różne caret-mode w różnych widokach, ta strategia nie ma jak.
+- **`ListView` (grid inline edit)** nie jest pokryty, bo controller jest `ViewController<DetailView>`. Dla `ListView` trzeba dorobić analogiczny lub zmienić bazę na samo `ViewController` i obsłużyć oba typy. Tematycznie należałoby przemyśleć, czy w gridzie też ma blokować.
+
+Dla większości projektów typu „demo + jedna aplikacja, jedna domena" ta wersja jest wystarczająca. Dla projektów, gdzie:
+
+- różne klasy biznesowe potrzebują różnych ustawień,
+- chcemy, żeby zmianę zachowania per widok mógł zrobić operator/admin bez rebuilda,
+- mamy zespół developerów i chcemy deklaratywnego API (atrybut na property zamiast „przeczytaj, co robi kontroler"),
+
+przechodzimy na wersję pełną opisaną w pozostałej części dokumentu.
+
+## Co dodać, żeby zarządzać tym z Model Editora
+
+Wersja minimalna z poprzedniej sekcji ma sztywno wpisane: „wszystko zablokowane, caret mode Advancing". Żeby z tego zrobić system, w którym deweloper i admin mogą wpływać na zachowanie bez rebuilda, dorzucamy następujące elementy. Każdy z nich rozwiązuje jeden konkretny problem wersji minimalnej, więc można je wprowadzać iteracyjnie — niekoniecznie wszystkie naraz.
+
+1. **Własna subclass `DateTimePropertyEditor` zamiast generycznego kontrolera** (dwie klasy: dla `DateTime` i `DateTime?`). Powód: PropertyEditor ma własne `Model` (`IModelMemberViewItem`), do którego XAF potrafi dorzucić nasze własne property widoczne w Model Editor. Generyczny `ViewController` nie ma „własnego Model" i nie zostanie pokazany w Model Editorze jako konfigurowalny.
+2. **Atrybut `[DateEditMouseWheel(false)]`** na property w business objectcie. Powód: są pola, gdzie decyzja „scroll OK / scroll blokuje" należy do modelu domenowego, nie do xafml — np. `Employee.Birthday`. Atrybut trzyma tę informację w kodzie razem z definicją property, gdzie ją znajdzie review pull requesta.
+3. **Interfejs `IModelMemberViewItemMouseWheel`** z nullable `BlockMouseWheel`. Powód: w Model Editor każdy `MemberViewItem` dostaje nowe property `BlockMouseWheel`. Pozwala wyłączyć blokadę dla pola w **konkretnym widoku** bez zmiany kodu — pole może być scrollowalne w jednym widoku, a zablokowane w drugim.
+4. **Interfejs `IModelOptionsDateEditMouseWheel`** z `BlockDateEditMouseWheelByDefault` i `DateEditMaskCaretMode`. Powód: globalna wartość domyślna dla całej aplikacji zapisana w `Model.xafml`. Admin/devops może to zmienić w trakcie deploy-a bez recompile.
+5. **`ExtendModelInterfaces` w `BlazorModule.cs`**. Powód: bez tego XAF Model Editor nie pokaże nowych property z punktów 3 i 4 — interfejsy istnieją, ale nie są zaczepione do bazowych `IModelMemberViewItem` / `IModelOptions`.
+6. **Konfigurator z kaskadą trzech poziomów** (atrybut → ViewItem → IModelOptions). Powód: trzymanie logiki decyzji „blokować czy nie" w jednym miejscu zamiast duplikowania w obu editorach. Przy okazji zapewnia jednoznaczną kolejność precedencji.
+7. **Wykrywanie sekcji czasu z formatu (`EditMask` / `DisplayFormat`)** w konfiguratorze. Powód: pole z `DisplayFormat="dd.MM.yyyy HH:mm"` powinno mieć widoczną sekcję czasu w UI, a pole z `dd.MM.yyyy` — nie. Bez wykrywania trzeba by trzymać dwa różne typy editorów albo manualnie ustawiać `TimeSectionVisible` w każdym xafml-u.
+8. **Dwie CSS-classy (`-blocked` i `-allowed`) zamiast jednej**. Powód: opt-out per pole działa tak, że pole „dozwolone" dostaje klasę `-allowed`. JS guard widząc tę klasę robi `return` **przed** sprawdzeniem `-blocked`. To prostszy mechanizm niż usuwanie klasy `-blocked`, bo działa też dla pól zagnieżdżonych.
+9. **JS jako moduł ESM z idempotentnym `ensureRegistered()`, ładowany przez controller**. Powód: pozbywamy się hardcoded `<script>` w `_Host.cshtml` (kolejność ładowania bywa krucha) i mamy gwarancję, że listener nie jest rejestrowany dwa razy nawet przy SignalR-reconnect.
+
+W pozostałej części artykułu każdy z tych punktów jest rozwinięty: **„Struktura plików"** pokazuje, gdzie który element siedzi; **„Trzy poziomy konfiguracji blokady kółka"** opisuje kaskadę z punktu 6 i atrybut z punktu 2; **„`MaskCaretMode`"** opisuje globalną konfigurację caret mode; **„Wykrywanie sekcji czasu z formatu"** rozwija punkt 7; **„Rejestracja w `BlazorModule`"** rozwija punkt 5; **„Blokada kółka po stronie JS"** rozwija punkty 8 i 9.
+
 ## Struktura plików
 
 Edytor jest rozbity tematycznie — po wzorcu z `OutlookInspiredDemo/DataDrive.Blazor.Server/Editors/`, każda odpowiedzialność w osobnym pliku.
