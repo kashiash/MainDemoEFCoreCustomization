@@ -101,6 +101,7 @@
     <Compile Include="API\CRUD\CustomDataService.cs" />
     <Compile Include="API\Security\AuthenticationController.cs" />
     <Compile Include="Controllers\DisableActionsController.cs" />
+    <Compile Include="Controllers\GlobalDateEditorTweaksController.cs" />
     <Compile Include="Controllers\LogonParametersViewController.cs" />
     <Compile Include="Controllers\LogonTitleController.cs" />
     <Compile Include="Controllers\ReportLocalizationController.cs" />
