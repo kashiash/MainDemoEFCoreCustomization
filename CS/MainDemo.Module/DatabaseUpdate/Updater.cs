@@ -13,6 +13,8 @@ using DevExpress.Persistent.BaseImpl.EF.PermissionPolicy;
 using DevExpress.Persistent.BaseImpl.EFCore.AuditTrail;
 using DevExpress.Xpo;
 using MainDemo.Module.BusinessObjects;
+using DevExpress.ExpressApp.Editors;
+using DevExpress.Drawing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MainDemo.Module.DatabaseUpdate;
@@ -192,6 +194,7 @@ public class Updater : ModuleUpdater {
 #endif
         UpdateStatus("CreateDashboardData", "", "Creating dashboard data in the database...");
         CreateDashboardData();
+        EnsureDynamicAppearanceRules();
 
         UpdateStatus("CreateSecurityData", "", "Creating users and roles in the database...");
 
@@ -492,6 +495,26 @@ public class Updater : ModuleUpdater {
             return content.Replace("LAST_YEAR", (DateTime.Now.Year - 1).ToString()).Replace("CURRENT_YEAR", DateTime.Now.Year.ToString());
         }
         return content;
+    }
+
+    private void EnsureDynamicAppearanceRules() {
+        if(ObjectSpace.FirstOrDefault<DynamicAppearanceRule>(rule => rule.Name == "Highlight overdue tasks") != null) {
+            return;
+        }
+
+        var rule = ObjectSpace.CreateObject<DynamicAppearanceRule>();
+        rule.Name = "Highlight overdue tasks";
+        rule.DataType = typeof(DemoTask);
+        rule.Criteria = "DueDate < LocalDateTimeToday() And Status != ##Enum#MainDemo.Module.BusinessObjects.TaskStatus,Completed#";
+        rule.TargetItems = "Subject;DueDate;AssignedTo";
+        rule.Context = "Any";
+        rule.AppearanceItemType = "ViewItem";
+        rule.Priority = 10;
+        rule.FontColor = Color.Firebrick;
+        rule.BackColor = Color.FromArgb(255, 244, 229);
+        rule.FontStyle = DXFontStyle.Bold;
+        rule.Visibility = ViewItemVisibility.Show;
+        ObjectSpace.CommitChanges();
     }
 }
 class PayrollSampleDataGenerator {

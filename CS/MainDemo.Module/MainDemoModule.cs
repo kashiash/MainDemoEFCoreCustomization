@@ -11,6 +11,7 @@ using MainDemo.Module.BusinessObjects;
 using MainDemo.Module.BusinessObjects.NonPersistent;
 using MainDemo.Module.CodeRules;
 using MainDemo.Module.Reports;
+using MainDemo.Module.Storages;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -38,9 +39,6 @@ public sealed class MainDemoModule : ModuleBase {
 
         this.AdditionalExportedTypes.Add(typeof(CustomNonPersistentObject));
         this.AdditionalExportedTypes.Add(typeof(UseSQLAlternativeInfo));
-    }
-    public override void Setup(XafApplication application) {
-        base.Setup(application);
     }
     public override void Setup(ApplicationModulesManager moduleManager) {
         base.Setup(moduleManager);
@@ -77,8 +75,22 @@ public sealed class MainDemoModule : ModuleBase {
                 typeof(PhoneNumber),
                 typeof(PortfolioFileData),
                 typeof(Position),
-                typeof(Resume)
+                typeof(Resume),
+                typeof(DynamicAppearanceRule)
             };
+    }
+
+    public override void Setup(XafApplication application) {
+        base.Setup(application);
+        application.SetupComplete += Application_SetupComplete;
+    }
+
+    private void Application_SetupComplete(object sender, EventArgs e) {
+        if(sender is not XafApplication application) {
+            return;
+        }
+        using var objectSpace = application.CreateObjectSpace(typeof(DynamicAppearanceRule));
+        DynamicAppearanceRuleStorage.Initialize(objectSpace.GetObjects<DynamicAppearanceRule>());
     }
 
     public override IList<PopupWindowShowAction> GetStartupActions() {

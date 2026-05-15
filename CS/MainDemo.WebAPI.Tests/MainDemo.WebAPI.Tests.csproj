@@ -24,6 +24,7 @@
     <Compile Include="CRUDTests.cs" />
     <Compile Include="CustomValidationTests.cs" />
     <Compile Include="LocalizationTests.cs" />
+    <Compile Include="DynamicAppearanceRuleTests.cs" />
     <Compile Include="ReportTests.cs" />
 	  <Compile Include="TestInfrastructure\*.cs" />
   </ItemGroup>

@@ -76,6 +76,7 @@ public class MainDemoDbContext : DbContext {
     public DbSet<Note> Notes { get; set; }
     public DbSet<DemoTask> Tasks { get; set; }
     public DbSet<DashboardData> DashboardData { get; set; }
+    public DbSet<DynamicAppearanceRule> DynamicAppearanceRules { get; set; }
 
     #region Default XAF Configurations
     public DbSet<ApplicationUser> Users { get; set; }

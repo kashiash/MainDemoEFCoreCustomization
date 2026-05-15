@@ -156,6 +156,25 @@
         <Member Name="Title" Caption="Nazwa" />
       </OwnMembers>
     </Class>
+    <Class Name="MainDemo.Module.BusinessObjects.DynamicAppearanceRule" Caption="Dynamiczna reguła wyglądu">
+      <OwnMembers>
+        <Member Name="AppearanceItemType" Caption="Typ elementu wyglądu" />
+        <Member Name="BackColor" Caption="Kolor tła" />
+        <Member Name="Context" Caption="Kontekst" />
+        <Member Name="Criteria" Caption="Kryterium" />
+        <Member Name="CssClass" Caption="Klasa CSS" />
+        <Member Name="DataType" Caption="Typ danych" />
+        <Member Name="Enabled" Caption="Włączone" />
+        <Member Name="FontColor" Caption="Kolor czcionki" />
+        <Member Name="FontStyle" Caption="Styl czcionki" />
+        <Member Name="Method" Caption="Metoda" />
+        <Member Name="Name" Caption="Nazwa" />
+        <Member Name="Priority" Caption="Priorytet" />
+        <Member Name="TargetItems" Caption="Pola docelowe" />
+        <Member Name="ViewId" Caption="Id widoku" />
+        <Member Name="Visibility" Caption="Widoczność" />
+      </OwnMembers>
+    </Class>
     <Class Name="MainDemo.Module.BusinessObjects.Employee" Caption="Pracownik">
       <OwnMembers>
         <Member Name="Address1" Caption="Adres prywatny" />

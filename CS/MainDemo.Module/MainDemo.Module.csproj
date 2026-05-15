@@ -55,6 +55,7 @@
     <Compile Include="Editors\**\*.cs" />
     <Compile Include="Properties\**\*.cs" />
     <Compile Include="Reports\**\*.cs" />
+    <Compile Include="Storages\**\*.cs" />
     <Compile Include="DemoDbEngineDetectorHelper.cs" />
     <Compile Include="ExternalAuthentication\CustomAuthenticationProvider.cs" />
     <Compile Include="MainDemoModule.cs" />
