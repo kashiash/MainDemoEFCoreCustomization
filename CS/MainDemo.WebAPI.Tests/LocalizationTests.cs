@@ -24,6 +24,18 @@ public class LocalizationTests : BaseWebApiTest {
     }
 
     [Fact]
+    public async System.Threading.Tasks.Task GetAdditionalPolishClassCaptions() {
+        var result = await SendRequestAsync("pl-PL", "ClassCaption?classFullName=MainDemo.Module.BusinessObjects.Position");
+        Assert.Equal("Stanowisko", result);
+
+        result = await SendRequestAsync("pl-PL", "ClassCaption?classFullName=MainDemo.Module.BusinessObjects.Resume");
+        Assert.Equal("CV", result);
+
+        result = await SendRequestAsync("pl-PL", "ClassCaption?classFullName=DevExpress.Persistent.BaseImpl.EF.ReportDataV2");
+        Assert.Equal("Raporty", result);
+    }
+
+    [Fact]
     public async System.Threading.Tasks.Task GetMemberCaption() {
         string url = "MemberCaption?classFullName=MainDemo.Module.BusinessObjects.Employee&memberName=Birthday";
 

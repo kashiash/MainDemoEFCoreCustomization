@@ -30,9 +30,66 @@
     </DisableReasons>
   </ActionDesign>
   <BOModel>
+    <Class Name="DevExpress.ExpressApp.Validation.AllContextsView.ContextValidationResult" Caption="Wynik walidacji">
+      <OwnMembers>
+        <Member Name="BrokenRules" Caption="Złamane reguły" />
+        <Member Name="Context" Caption="Kontekst" />
+        <Member Name="ContextValidationOutcome" Caption="Wynik" />
+      </OwnMembers>
+    </Class>
+    <Class Name="DevExpress.ExpressApp.Validation.AllContextsView.ValidationResults" Caption="Wyniki walidacji">
+      <OwnMembers>
+        <Member Name="HighlightErrors" Caption="Pokaż błędy" />
+        <Member Name="Results" Caption="Wyniki" />
+      </OwnMembers>
+    </Class>
+    <Class Name="DevExpress.Persistent.BaseImpl.EF.Event" Caption="Kalendarz">
+      <OwnMembers>
+        <Member Name="AllDay" Caption="Cały dzień" />
+        <Member Name="Description" Caption="Opis" />
+        <Member Name="EndOn" Caption="Koniec" />
+        <Member Name="Label" Caption="Etykieta" />
+        <Member Name="Location" Caption="Lokalizacja" />
+        <Member Name="RecurrenceInfoXml" Caption="Powtarzanie" />
+        <Member Name="ReminderTime" Caption="Przypomnienie" />
+        <Member Name="Resources" Caption="Zasoby" />
+        <Member Name="StartOn" Caption="Początek" />
+        <Member Name="Subject" Caption="Temat" />
+      </OwnMembers>
+    </Class>
+    <Class Name="DevExpress.Persistent.BaseImpl.EF.FileData" Caption="Plik">
+      <OwnMembers>
+        <Member Name="FileName" Caption="Nazwa pliku" />
+        <Member Name="Size" Caption="Rozmiar" />
+      </OwnMembers>
+    </Class>
+    <Class Name="DevExpress.Persistent.BaseImpl.EF.PermissionPolicy.PermissionPolicyActionPermissionObject" Caption="Uprawnienia akcji">
+      <OwnMembers>
+        <Member Name="ActionDescriptor" Caption="Akcja" />
+        <Member Name="ActionId" Caption="Id akcji" />
+        <Member Name="Category" Caption="Kategoria" />
+        <Member Name="Image" Caption="Obraz" />
+        <Member Name="Role" Caption="Rola" />
+      </OwnMembers>
+    </Class>
+    <Class Name="DevExpress.Persistent.BaseImpl.EF.PermissionPolicy.PermissionPolicyNavigationPermissionObject" Caption="Uprawnienia nawigacji">
+      <OwnMembers>
+        <Member Name="ItemPath" Caption="Element nawigacji" />
+      </OwnMembers>
+    </Class>
     <Class Name="DevExpress.Persistent.BaseImpl.EF.PermissionPolicy.PermissionPolicyRole" Caption="Rola">
       <OwnMembers>
         <Member Name="Users" Caption="Użytkownicy" />
+      </OwnMembers>
+    </Class>
+    <Class Name="DevExpress.Persistent.BaseImpl.EF.PermissionPolicy.PermissionPolicyRoleBase" Caption="Rola bazowa">
+      <OwnMembers>
+        <Member Name="ActionPermissions" Caption="Uprawnienia akcji" />
+        <Member Name="CanEditModel" Caption="Może edytować model" />
+        <Member Name="IsAdministrative" Caption="Administrator" />
+        <Member Name="NavigationPermissions" Caption="Uprawnienia nawigacji" />
+        <Member Name="PermissionPolicy" Caption="Polityka uprawnień" />
+        <Member Name="TypePermissions" Caption="Uprawnienia typów" />
       </OwnMembers>
     </Class>
     <Class Name="DevExpress.Persistent.BaseImpl.EF.PermissionPolicy.PermissionPolicyUser" Caption="Użytkownik">
@@ -41,6 +98,27 @@
         <Member Name="IsActive" Caption="Aktywny" />
         <Member Name="Roles" Caption="Role" />
         <Member Name="UserName" Caption="Nazwa użytkownika" />
+      </OwnMembers>
+    </Class>
+    <Class Name="DevExpress.Persistent.BaseImpl.EF.ReportDataV2" Caption="Raporty">
+      <OwnMembers>
+        <Member Name="DataTypeCaption" Caption="Typ danych" />
+        <Member Name="DisplayName" Caption="Nazwa wyświetlana" />
+        <Member Name="IsInplaceReport" Caption="Raport osadzony" />
+        <Member Name="IsPredefined" Caption="Tylko do odczytu" />
+        <Member Name="ParametersObjectType" Caption="Typ danych parametrow" />
+      </OwnMembers>
+    </Class>
+    <Class Name="DevExpress.Persistent.BaseImpl.EFCore.AuditTrail.AuditDataItemPersistent" Caption="Historia zmian">
+      <OwnMembers>
+        <Member Name="AuditedDefaultString" Caption="Obiekt audytowany" />
+        <Member Name="AuditOperationType" Caption="Typ operacji" />
+        <Member Name="ModifiedOn" Caption="Zmodyfikowano" />
+        <Member Name="NewValue" Caption="Nowa wartość" />
+        <Member Name="ObjectType" Caption="Typ obiektu" />
+        <Member Name="OldValue" Caption="Stara wartość" />
+        <Member Name="PropertyName" Caption="Nazwa pola" />
+        <Member Name="UserName" Caption="Uzytkownik" />
       </OwnMembers>
     </Class>
     <Class Name="MainDemo.Module.BusinessObjects.Address" Caption="Adres">
@@ -141,23 +219,194 @@
         <Member Name="PhoneType" Caption="Typ telefonu" />
       </OwnMembers>
     </Class>
+    <Class Name="MainDemo.Module.BusinessObjects.PortfolioFileData" Caption="Portfolio">
+      <OwnMembers>
+        <Member Name="DocumentType" Caption="Typ dokumentu" />
+        <Member Name="File" Caption="Plik" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MainDemo.Module.BusinessObjects.Position" Caption="Stanowisko">
+      <OwnMembers>
+        <Member Name="Departments" Caption="Działy" />
+        <Member Name="Employees" Caption="Pracownicy" />
+        <Member Name="Title" Caption="Nazwa" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MainDemo.Module.BusinessObjects.Resume" Caption="CV">
+      <OwnMembers>
+        <Member Name="Employee" Caption="Pracownik" />
+        <Member Name="File" Caption="Plik" />
+        <Member Name="Portfolio" Caption="Portfolio" />
+      </OwnMembers>
+    </Class>
   </BOModel>
   <Localization>
+    <LocalizationGroup Name="Enums">
+      <LocalizationGroup Name="DevExpress.Persistent.Base.SecurityPermissionPolicy" Value="Polityka uprawnień">
+        <LocalizationItem Name="AllowAllByDefault" Value="Domyślnie zezwalaj na wszystko" />
+        <LocalizationItem Name="DenyAllByDefault" Value="Domyślnie odmawiaj wszystkiego" />
+        <LocalizationItem Name="ReadOnlyAllByDefault" Value="Domyślnie tylko odczyt" />
+      </LocalizationGroup>
+      <LocalizationGroup Name="DevExpress.Persistent.Base.SecurityPermissionState" Value="Nawigacja">
+        <LocalizationItem Name="Allow" Value="Zezwól" />
+        <LocalizationItem Name="Deny" Value="Odmów" />
+      </LocalizationGroup>
+      <LocalizationGroup Name="DevExpress.Persistent.BaseImpl.EFCore.AuditTrail.AuditOperationType">
+        <LocalizationItem Name="AddedToCollection" Value="Dodano do kolekcji" />
+        <LocalizationItem Name="CustomData" Value="Dane niestandardowe" />
+        <LocalizationItem Name="InitialValueAssigned" Value="Przypisano wartość początkową" />
+        <LocalizationItem Name="ObjectChanged" Value="Zmieniono obiekt" />
+        <LocalizationItem Name="ObjectCreated" Value="Utworzono obiekt" />
+        <LocalizationItem Name="ObjectDeleted" Value="Usunięto obiekt" />
+        <LocalizationItem Name="RemovedFromCollection" Value="Usunięto z kolekcji" />
+      </LocalizationGroup>
+      <LocalizationGroup Name="MainDemo.Module.BusinessObjects.DocumentType">
+        <LocalizationItem Name="Diagrams" Value="Diagramy" />
+        <LocalizationItem Name="Documentation" Value="Dokumentacja" />
+        <LocalizationItem Name="Screenshots" Value="Zrzuty ekranu" />
+        <LocalizationItem Name="SourceCode" Value="Kod źródłowy" />
+        <LocalizationItem Name="Tests" Value="Testy" />
+        <LocalizationItem Name="Unknown" Value="Nieznany" />
+      </LocalizationGroup>
+      <LocalizationGroup Name="MainDemo.Module.BusinessObjects.Priority">
+        <LocalizationItem Name="High" Value="Wysoki" />
+        <LocalizationItem Name="Low" Value="Niski" />
+        <LocalizationItem Name="Normal" Value="Normalny" />
+      </LocalizationGroup>
+      <LocalizationGroup Name="MainDemo.Module.BusinessObjects.TaskStatus">
+        <LocalizationItem Name="NotStarted" Value="Nie rozpoczęto" />
+        <LocalizationItem Name="InProgress" Value="W toku" />
+        <LocalizationItem Name="WaitingForSomeoneElse" Value="Oczekuje na inną osobę" />
+        <LocalizationItem Name="Deferred" Value="Odroczone" />
+        <LocalizationItem Name="Completed" Value="Zakończone" />
+      </LocalizationGroup>
+    </LocalizationGroup>
+    <LocalizationGroup Name="Messages">
+      <LocalizationItem Name="CannotUploadFile" Value="Nie można przesłać pliku {0}, gdy trwa przesyłanie innego pliku." />
+    </LocalizationGroup>
     <LocalizationGroup Name="Paycheck" IsNewNode="True">
       <LocalizationItem Name="ChartLabel" Value="Miesięczny harmonogram wynagrodzeń" IsNewNode="True" />
     </LocalizationGroup>
   </Localization>
+  <NavigationItems>
+    <Items>
+      <Item Id="Default" Caption="Domyślne">
+        <Items>
+          <Item Id="Employee_ListView" Caption="Pracownicy" />
+          <Item Id="ApplicationUser_ListView" Caption="Użytkownicy" />
+          <Item Id="DemoTask_ListView" Caption="Zadania" />
+          <Item Id="Department_ListView" Caption="Działy" />
+          <Item Id="Event_ListView" Caption="Kalendarz" />
+          <Item Id="Note" Caption="Notatka" />
+          <Item Id="Paycheck_ListView" Caption="Wypłaty" />
+          <Item Id="PermissionPolicyRole_ListView" Caption="Role" />
+          <Item Id="Position_ListView" Caption="Stanowiska" />
+          <Item Id="Resume_ListView" Caption="CV" />
+        </Items>
+      </Item>
+      <Item Id="Reports" Caption="Raporty">
+        <Items>
+          <Item Id="ReportsV2" Caption="Raporty" />
+        </Items>
+      </Item>
+    </Items>
+  </NavigationItems>
   <Views>
-    <ListView Id="Employee_ListView" Caption="Pracownicy" />
-    <ListView Id="Department_ListView" Caption="Działy" />
+    <ListView Id="ApplicationUser_ListView" Caption="Użytkownicy" />
+    <ListView Id="AuditDataItemPersistent_ListView" Caption="Historia zmian" />
+    <DetailView Id="AuthenticationStandardLogonParameters_DetailView_Demo" Caption="Logowanie">
+      <Items>
+        <StaticText Id="LogonText" Text="Wpisz nazwę użytkownika i hasło, aby kontynuować." />
+        <StaticText Id="PasswordHint" Text="Ta aplikacja demonstracyjna nie wymaga hasła do logowania." />
+      </Items>
+    </DetailView>
+    <DetailView Id="DemoTask_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="SimpleEditors">
+            <LayoutGroup Id="DemoTask">
+              <LayoutGroup Id="Task" Caption="Szczegoly" />
+              <LayoutGroup Id="AdditionalInformation" Caption="Dodatkowe informacje" />
+            </LayoutGroup>
+          </LayoutGroup>
+          <LayoutGroup Id="Employees_Group" Caption="Pracownicy" />
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
     <ListView Id="DemoTask_ListView" Caption="Zadania" />
-    <ListView Id="Note_ListView" Caption="Notatki" />
-    <ListView Id="Paycheck_ListView" Caption="Wypłaty" />
-    <ListView Id="Paycheck_ListView_Varied" Caption="Wypłaty">
+    <DetailView Id="Department_DetailView">
+      <Items>
+        <PropertyEditor Id="Employees" Caption="Pracownicy" />
+      </Items>
+    </DetailView>
+    <ListView Id="Department_ListView" Caption="Działy" />
+    <DetailView Id="Employee_DetailView">
+      <Items>
+        <PropertyEditor Id="Address1" Caption="Adres" />
+      </Items>
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="SimpleEditors">
+            <LayoutGroup Id="Employee" Caption="Dodatkowe informacje" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="Employee_ListView" Caption="Pracownicy">
+      <Filters>
+        <Filter Id="AllEmployees" Caption="Wszyscy pracownicy" />
+        <Filter Id="Developers" Caption="Programisci" />
+        <Filter Id="Managers" Caption="Kierownicy" />
+        <Filter Id="TopExecutives" Caption="Kadra zarządzająca" />
+      </Filters>
+    </ListView>
+    <ListView Id="Employee_ListView_AllColumns" Caption="Pracownicy" />
+    <ListView Id="Employee_ListView_Varied">
       <Variants>
         <Variant Id="Default" Caption="Widok siatki" IsNewNode="True" />
-        <Variant Id="Chart" Caption="Widok wykresu" IsNewNode="True" />
+        <Variant Id="All columns" Caption="Wszystkie kolumny" />
       </Variants>
+    </ListView>
+    <DetailView Id="Event_DetailView" Caption="Wydarzenie" />
+    <ListView Id="Event_ListView" Caption="Kalendarz" />
+    <ListView Id="Note_ListView" Caption="Notatki" />
+    <DetailView Id="Paycheck_DetailView" Caption="Wyplata">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="Autoc7781f53-9294-4695-b3a5-f47400c12e7a">
+            <LayoutGroup Id="Employee_Group" Caption="Dane pracownika" />
+            <LayoutGroup Id="Period_Group" Caption="Okres" />
+          </LayoutGroup>
+          <LayoutGroup Id="Autoc465db88-4795-44dc-a2a0-cbf0c4c1eaca">
+            <LayoutGroup Id="Totals_Group" Caption="Podsumowanie" />
+            <LayoutGroup Id="Payment_Group" Caption="Szczegóły wypłaty" />
+          </LayoutGroup>
+          <LayoutGroup Id="Overtime_Pay" Caption="Nadgodziny" />
+          <LayoutGroup Id="SizeableEditors" Caption="Uwagi" />
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="Paycheck_ListView" Caption="Wypłaty">
+      <BandsLayout Enable="True">
+        <Band Id="Period" Caption="Okres" Index="2" IsNewNode="True" />
+        <Band Id="Payment" Caption="Płatność" Index="3" IsNewNode="True" />
+        <Band Id="Overtime" Caption="Nadgodziny" Index="4" IsNewNode="True" />
+        <Band Id="Total" Caption="Suma" Index="10" IsNewNode="True" />
+      </BandsLayout>
+    </ListView>
+    <ListView Id="Paycheck_LookupListView" Caption="Wypłaty" />
+    <ListView Id="PermissionPolicyRole_ListView" Caption="Role" />
+    <DetailView Id="PortfolioFileData_DetailView">
+      <Items>
+        <PropertyEditor Id="File" Caption="Plik" />
+      </Items>
+    </DetailView>
+    <ListView Id="ReportDataV2_ListView" Caption="Raporty" />
+    <ListView Id="Resume_ListView" Caption="CV" />
+    <ListView Id="Resume_Portfolio_ListView">
+      <Columns>
+        <ColumnInfo Id="File" Caption="Plik" />
+      </Columns>
     </ListView>
   </Views>
 </Application>
