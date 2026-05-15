@@ -52,6 +52,17 @@ public class MainDemoDbContext : DbContext {
             .HasOne(task => task.AssignedTo)
             .WithMany()
             .OnDelete(DeleteBehavior.SetNull);
+        modelBuilder.Entity<DocumentFile>()
+            .HasOne(documentFile => documentFile.Employee)
+            .WithMany(employee => employee.DocumentFiles)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<DocumentFile>()
+            .HasOne(documentFile => documentFile.DemoTask)
+            .WithMany(task => task.DocumentFiles)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<DocumentFile>()
+            .Property(documentFile => documentFile.UploadedAtUtc)
+            .HasColumnType("datetime2");
 
         modelBuilder.Entity<ApplicationUserLoginInfo>(b => {
             b.HasIndex(nameof(ISecurityUserLoginInfo.LoginProviderName), nameof(ISecurityUserLoginInfo.ProviderUserKey)).IsUnique();
@@ -77,6 +88,8 @@ public class MainDemoDbContext : DbContext {
     public DbSet<DemoTask> Tasks { get; set; }
     public DbSet<DashboardData> DashboardData { get; set; }
     public DbSet<DynamicAppearanceRule> DynamicAppearanceRules { get; set; }
+    public DbSet<DocumentFile> DocumentFiles { get; set; }
+    public DbSet<DocumentFileType> DocumentFileTypes { get; set; }
 
     #region Default XAF Configurations
     public DbSet<ApplicationUser> Users { get; set; }

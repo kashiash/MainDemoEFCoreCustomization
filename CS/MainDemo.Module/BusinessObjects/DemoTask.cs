@@ -17,7 +17,7 @@ namespace MainDemo.Module.BusinessObjects;
 [RuleCriteria("Task_Status", DefaultContexts.Save, "IIF(Status != 'NotStarted' and Status != 'Deferred', AssignedTo is not null, True)", CustomMessageTemplate = @"The task must have an assignee when its Status is ""In progress"", ""Waiting for someone else"", or ""Completed"".", SkipNullOrEmptyValues = false)]
 [RuleCriteria("TaskIsNotStarted", DefaultContexts.Save, "Status != 'NotStarted'", CustomMessageTemplate = "Cannot set the task completed because it's not started.", TargetContextIDs = "MarkCompleted")]
 [DefaultProperty(nameof(Subject))]
-public class DemoTask : BaseObject {
+public class DemoTask : BaseObject, IHasDocumentFiles {
     public virtual DateTime? DateCompleted { get; set; }
 
     public virtual String Subject { get; set; }
@@ -94,6 +94,9 @@ public class DemoTask : BaseObject {
     }
     [ToolTip("View, assign or remove employees for the current task")]
     public virtual IList<Employee> Employees { get; set; } = new ObservableCollection<Employee>();
+
+    [Aggregated]
+    public virtual IList<DocumentFile> DocumentFiles { get; set; } = new ObservableCollection<DocumentFile>();
 
     [Appearance("PriorityBackColorPink", AppearanceItemType = "ViewItem", Criteria = "Priority=2", BackColor = "0x14FF0000")]
     public virtual Priority Priority { get; set; }

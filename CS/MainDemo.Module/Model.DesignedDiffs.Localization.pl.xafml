@@ -139,6 +139,7 @@
     <Class Name="MainDemo.Module.BusinessObjects.DemoTask" Caption="Zadanie">
       <OwnMembers>
         <Member Name="ActualWorkHours" Caption="Rzeczywiste godziny pracy" />
+        <Member Name="DocumentFiles" Caption="Załączniki" />
         <Member Name="Employees" Caption="Pracownicy" />
         <Member Name="EstimatedWorkHours" Caption="Szacowane godziny pracy" />
         <Member Name="Priority" Caption="Priorytet" />
@@ -183,6 +184,7 @@
         <Member Name="Birthday" Caption="Data urodzenia" />
         <Member Name="ChangeHistory" Caption="Historia zmian" />
         <Member Name="Department" Caption="Dział" />
+        <Member Name="DocumentFiles" Caption="Załączniki" />
         <Member Name="FirstName" Caption="Imię" />
         <Member Name="FullName" Caption="Imię i nazwisko" />
         <Member Name="LastName" Caption="Nazwisko" />
@@ -198,6 +200,33 @@
         <Member Name="Tasks" Caption="Zadania" />
         <Member Name="TitleOfCourtesy" Caption="Forma grzecznościowa" />
         <Member Name="WebPageAddress" Caption="Strona WWW" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MainDemo.Module.BusinessObjects.DocumentFile" Caption="Dokument">
+      <OwnMembers>
+        <Member Name="DemoTask" Caption="Zadanie" />
+        <Member Name="Description" Caption="Opis" />
+        <Member Name="DisplayName" Caption="Nazwa" />
+        <Member Name="Employee" Caption="Pracownik" />
+        <Member Name="File" Caption="Plik" />
+        <Member Name="PreviewFile" Caption="Podgląd" />
+        <Member Name="Type" Caption="Typ dokumentu" />
+        <Member Name="UploadedAtUtc" Caption="Wgrano" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MainDemo.Module.BusinessObjects.DocumentFileType" Caption="Typ dokumentu">
+      <OwnMembers>
+        <Member Name="Code" Caption="Kod" />
+        <Member Name="Description" Caption="Opis" />
+        <Member Name="IsActive" Caption="Aktywny" />
+        <Member Name="Name" Caption="Nazwa" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MainDemo.Module.BusinessObjects.DocumentFileUploadParameters" Caption="Dodaj pliki">
+      <OwnMembers>
+        <Member Name="Description" Caption="Opis" />
+        <Member Name="Type" Caption="Typ dokumentu" />
+        <Member Name="UploadArea" Caption="Pliki" />
       </OwnMembers>
     </Class>
     <Class Name="MainDemo.Module.BusinessObjects.Location" Caption="Lokalizacja">
@@ -315,6 +344,7 @@
           <Item Id="ApplicationUser_ListView" Caption="Użytkownicy" />
           <Item Id="DemoTask_ListView" Caption="Zadania" />
           <Item Id="Department_ListView" Caption="Działy" />
+          <Item Id="DocumentFileType_ListView" Caption="Typy dokumentów" />
           <Item Id="Event_ListView" Caption="Kalendarz" />
           <Item Id="Note" Caption="Notatka" />
           <Item Id="Paycheck_ListView" Caption="Wypłaty" />
@@ -349,6 +379,7 @@
             </LayoutGroup>
           </LayoutGroup>
           <LayoutGroup Id="Employees_Group" Caption="Pracownicy" />
+          <LayoutGroup Id="DocumentFiles_Group" Caption="Załączniki" />
         </LayoutGroup>
       </Layout>
     </DetailView>
@@ -368,9 +399,17 @@
           <LayoutGroup Id="SimpleEditors">
             <LayoutGroup Id="Employee" Caption="Dodatkowe informacje" />
           </LayoutGroup>
+          <TabbedGroup Id="Tabs">
+            <LayoutGroup Id="DocumentFiles" Caption="Załączniki" />
+          </TabbedGroup>
         </LayoutGroup>
       </Layout>
     </DetailView>
+    <DetailView Id="DocumentFile_DetailView" Caption="Dokument" />
+    <ListView Id="DocumentFile_ListView" Caption="Dokumenty" />
+    <DetailView Id="DocumentFileType_DetailView" Caption="Typ dokumentu" />
+    <ListView Id="DocumentFileType_ListView" Caption="Typy dokumentów" />
+    <DetailView Id="DocumentFileUploadParameters_DetailView" Caption="Dodaj pliki" />
     <ListView Id="Employee_ListView" Caption="Pracownicy">
       <Filters>
         <Filter Id="AllEmployees" Caption="Wszyscy pracownicy" />

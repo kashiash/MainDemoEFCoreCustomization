@@ -195,6 +195,8 @@ public class Updater : ModuleUpdater {
         UpdateStatus("CreateDashboardData", "", "Creating dashboard data in the database...");
         CreateDashboardData();
         EnsureDynamicAppearanceRules();
+        EnsureDocumentFileTypes();
+        EnsureSampleDocumentFiles();
 
         UpdateStatus("CreateSecurityData", "", "Creating users and roles in the database...");
 
@@ -515,6 +517,93 @@ public class Updater : ModuleUpdater {
         rule.FontStyle = DXFontStyle.Bold;
         rule.Visibility = ViewItemVisibility.Show;
         ObjectSpace.CommitChanges();
+    }
+
+    private void EnsureDocumentFileTypes() {
+        (string Code, string Name, string Description)[] documentTypes = [
+            ("INVOICE", "Faktura", "Faktury sprzedażowe i kosztowe"),
+            ("CONTRACT", "Umowa", "Umowy i aneksy"),
+            ("LETTER", "Korespondencja", "Pisma i korespondencja"),
+            ("ID_SCAN", "Skan dokumentu", "Skany dokumentów tożsamości i pełnomocnictw"),
+            ("PROTOCOL", "Protokół", "Protokoły odbioru i ustalenia"),
+            ("OTHER", "Inne", "Pozostałe dokumenty")
+        ];
+
+        foreach(var (code, name, description) in documentTypes) {
+            var documentType = ObjectSpace.FirstOrDefault<DocumentFileType>(item => item.Code == code);
+            if(documentType != null) {
+                continue;
+            }
+
+            documentType = ObjectSpace.CreateObject<DocumentFileType>();
+            documentType.Code = code;
+            documentType.Name = name;
+            documentType.Description = description;
+        }
+
+        ObjectSpace.CommitChanges();
+    }
+
+    private void EnsureSampleDocumentFiles() {
+        var employee = FindEmployee("Andrea", "Deville");
+        if(employee != null && !employee.DocumentFiles.Any()) {
+            employee.DocumentFiles.Add(CreateSampleDocumentFile(
+                "employee-welcome-note.pdf",
+                "LETTER",
+                "Przykładowe pismo przypięte do pracownika.",
+                """
+                %PDF-1.4
+                1 0 obj
+                << /Type /Catalog /Pages 2 0 R >>
+                endobj
+                2 0 obj
+                << /Type /Pages /Kids [3 0 R] /Count 1 >>
+                endobj
+                3 0 obj
+                << /Type /Page /Parent 2 0 R /MediaBox [0 0 300 144] /Contents 4 0 R >>
+                endobj
+                4 0 obj
+                << /Length 44 >>
+                stream
+                BT /F1 12 Tf 20 100 Td (MainDemo sample document) Tj ET
+                endstream
+                endobj
+                xref
+                0 5
+                0000000000 65535 f 
+                0000000010 00000 n 
+                0000000063 00000 n 
+                0000000122 00000 n 
+                0000000208 00000 n 
+                trailer
+                << /Root 1 0 R /Size 5 >>
+                startxref
+                302
+                %%EOF
+                """));
+        }
+
+        var demoTask = ObjectSpace.FirstOrDefault<DemoTask>(task => task.Subject == "Review reports");
+        if(demoTask != null && !demoTask.DocumentFiles.Any()) {
+            demoTask.DocumentFiles.Add(CreateSampleDocumentFile(
+                "task-checklist.txt",
+                "PROTOCOL",
+                "Przykładowy dokument przypięty do zadania.",
+                "Checklist:\r\n- review reports\r\n- prepare feedback\r\n- close follow-up"));
+        }
+
+        ObjectSpace.CommitChanges();
+    }
+
+    private DocumentFile CreateSampleDocumentFile(string fileName, string documentTypeCode, string description, string content) {
+        var documentFile = ObjectSpace.CreateObject<DocumentFile>();
+        var file = ObjectSpace.CreateObject<FileData>();
+        using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(content));
+        file.LoadFromStream(fileName, stream);
+        documentFile.File = file;
+        documentFile.Type = ObjectSpace.FirstOrDefault<DocumentFileType>(item => item.Code == documentTypeCode);
+        documentFile.Description = description;
+        return documentFile;
     }
 }
 class PayrollSampleDataGenerator {

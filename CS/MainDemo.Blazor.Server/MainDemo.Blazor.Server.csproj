@@ -99,8 +99,10 @@
   <ItemGroup>
     <Compile Include="Services\**\*.cs" />
     <Compile Include="API\CRUD\CustomDataService.cs" />
+    <Compile Include="API\Documents\DocumentFileUploadController.cs" />
     <Compile Include="API\Security\AuthenticationController.cs" />
     <Compile Include="Controllers\DisableActionsController.cs" />
+    <Compile Include="Controllers\DocumentFileNestedListViewController.cs" />
     <Compile Include="Controllers\GlobalDateEditorTweaksController.cs" />
     <Compile Include="Controllers\LogonParametersViewController.cs" />
     <Compile Include="Controllers\LogonTitleController.cs" />
@@ -108,6 +110,7 @@
     <Compile Include="API\Reports\ReportController.cs" />
     <Compile Include="Controllers\UseSQLAlternativeInfoController.cs" />
     <Compile Include="CustomTypePropertyEditor.cs" />
+    <Compile Include="Editors\Documents\**\*.cs" />
     <Compile Include="Editors\Date\**\*.cs" />
     <Compile Include="MainDemoBlazorApplication.cs" />
     <Compile Include="BlazorModule.cs" />
@@ -122,6 +125,7 @@
     <Content Include="API\Reports\Readme.txt" />
     <Content Include="API\Security\Readme.txt" />
     <Content Include="Charts\*.razor" />
+    <Content Include="Editors\Documents\*.razor" />
     <Content Include="Pages\_Host.cshtml" />
     <Content Include="Properties\launchSettings.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="wwwroot\**\*.*" CopyToPublishDirectory="PreserveNewest" />

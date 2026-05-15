@@ -1,0 +1,63 @@
+@using DevExpress.Persistent.Base
+@inject IJSRuntime JSRuntime
+
+@if (string.IsNullOrEmpty(ContentUrl)) {
+    <div class="text-muted">Brak pliku do podglądu.</div>
+}
+else {
+    <div class="d-flex gap-2 mb-2">
+        <button class="btn btn-sm btn-outline-primary" type="button" @onclick="Download">
+            Pobierz @FileName
+        </button>
+    </div>
+
+    @if (Extension == "pdf") {
+        <object data="@ContentUrl" type="application/pdf" width="100%" height="800"></object>
+    }
+    else if (Extension is "jpg" or "jpeg" or "png" or "gif" or "bmp" or "webp") {
+        <img src="@ContentUrl" style="max-width:100%; max-height:800px;" alt="@FileName" />
+    }
+    else {
+        <div class="alert alert-info">
+            Podgląd inline jest dostępny dla PDF i obrazów. Ten plik można pobrać.
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public IFileData FileData { get; set; }
+
+    private string ContentUrl { get; set; } = string.Empty;
+    private string RawBase64 { get; set; } = string.Empty;
+    private string FileName { get; set; } = string.Empty;
+    private string Extension { get; set; } = string.Empty;
+
+    protected override void OnParametersSet() {
+        FileName = FileData?.FileName ?? string.Empty;
+        Extension = Path.GetExtension(FileName).TrimStart('.').ToLowerInvariant();
+
+        if (FileData == null || FileData.Size <= 0) {
+            ContentUrl = string.Empty;
+            RawBase64 = string.Empty;
+            return;
+        }
+
+        using var stream = new MemoryStream();
+        FileData.SaveToStream(stream);
+        RawBase64 = Convert.ToBase64String(stream.ToArray());
+
+        string mimeType = Extension switch {
+            "pdf" => "application/pdf",
+            "jpg" or "jpeg" => "image/jpeg",
+            "png" => "image/png",
+            "gif" => "image/gif",
+            "bmp" => "image/bmp",
+            "webp" => "image/webp",
+            _ => "application/octet-stream"
+        };
+        ContentUrl = $"data:{mimeType};base64,{RawBase64}";
+    }
+
+    private Task Download() =>
+        JSRuntime.InvokeVoidAsync("downloadFileFromBase64", FileName, RawBase64).AsTask();
+}

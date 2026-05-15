@@ -1,0 +1,57 @@
+@using DevExpress.Blazor
+
+<div class="card p-3">
+    <DxUpload Name="files"
+              UploadUrl="@UploadUrl"
+              AllowMultiFileUpload="true"
+              UploadMode="UploadMode.Instant"
+              AllowedFileExtensions="@AllowedExtensions"
+              MaxFileSize="100000000"
+              ExternalDropZoneCssSelector=".doc-upload-drop-zone"
+              ExternalSelectButtonCssSelector=".doc-upload-select-button"
+              AdditionalParameters="@AdditionalParameters"
+              FileUploaded="@OnFileUploaded" />
+
+    <div class="doc-upload-drop-zone p-4 mt-2 text-center text-muted"
+         style="border:2px dashed #cfcfcf; border-radius:8px; min-height:120px;">
+        Przeciągnij pliki tutaj
+    </div>
+
+    <button class="doc-upload-select-button btn btn-primary mt-2" type="button">
+        Wybierz pliki
+    </button>
+
+    @if (UploadedCount > 0) {
+        <div class="alert alert-success mt-2">
+            Wgrano plików: @UploadedCount. Zamknij okno, aby odświeżyć listę.
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string OwnerObjectType { get; set; } = string.Empty;
+    [Parameter] public Guid OwnerObjectId { get; set; }
+    [Parameter] public Guid? TypeId { get; set; }
+    [Parameter] public string Description { get; set; } = string.Empty;
+
+    private const string UploadUrl = "/api/document-files/upload";
+    private static readonly List<string> AllowedExtensions =
+        [".pdf", ".jpg", ".jpeg", ".png", ".gif", ".docx", ".xlsx"];
+
+    private Dictionary<string, string> AdditionalParameters { get; set; } = new();
+    private int UploadedCount { get; set; }
+
+    protected override void OnParametersSet() {
+        AdditionalParameters = new Dictionary<string, string> {
+            ["ownerObjectType"] = OwnerObjectType ?? string.Empty,
+            ["ownerObjectId"] = OwnerObjectId.ToString(),
+            ["typeId"] = TypeId?.ToString() ?? string.Empty,
+            ["description"] = Description ?? string.Empty
+        };
+    }
+
+    private void OnFileUploaded(FileUploadEventArgs args) {
+        UploadedCount++;
+        StateHasChanged();
+    }
+}

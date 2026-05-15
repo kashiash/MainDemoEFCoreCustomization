@@ -41,6 +41,7 @@
 					<Item Id="PermissionPolicyRole_ListView" Index="7" />
 					<Item Id="ApplicationUser_ListView" Index="8" />
 					<Item Id="Resume_ListView" Index="9" />
+					<Item Id="DocumentFileType_ListView" Index="10" IsNewNode="True" />
 				</Items>
 			</Item>
 		</Items>
@@ -148,9 +149,47 @@
 				<ColumnInfo Id="PhoneType" MinWidth="80" />
 			</Columns>
 		</ListView>
+		<ListView Id="Employee_DocumentFiles_ListView">
+			<Columns>
+				<ColumnInfo Id="File" MinWidth="180" />
+				<ColumnInfo Id="Type" MinWidth="140" />
+				<ColumnInfo Id="Description" MinWidth="220" />
+				<ColumnInfo Id="UploadedAtUtc" MinWidth="140" />
+			</Columns>
+		</ListView>
 		<ListView Id="Resume_Portfolio_ListView">
 			<Columns>
 				<ColumnInfo Id="File" SortIndex="-1" SortOrder="None" />
+			</Columns>
+		</ListView>
+		<DetailView Id="DocumentFile_DetailView">
+			<Items>
+				<PropertyEditor Id="PreviewFile" PropertyName="PreviewFile" IsNewNode="True" />
+			</Items>
+			<Layout>
+				<LayoutGroup Id="Main">
+					<TabbedGroup Id="Tabs" IsNewNode="True">
+						<LayoutGroup Id="Preview" Caption="Preview" Index="0" IsNewNode="True">
+							<LayoutItem Id="PreviewFile" ViewItem="PreviewFile" ShowCaption="False" IsNewNode="True" />
+						</LayoutGroup>
+					</TabbedGroup>
+				</LayoutGroup>
+			</Layout>
+		</DetailView>
+		<ListView Id="DocumentFile_ListView">
+			<Columns>
+				<ColumnInfo Id="File" MinWidth="180" />
+				<ColumnInfo Id="Type" MinWidth="140" />
+				<ColumnInfo Id="Description" MinWidth="220" />
+				<ColumnInfo Id="UploadedAtUtc" MinWidth="140" />
+			</Columns>
+		</ListView>
+		<ListView Id="DemoTask_DocumentFiles_ListView" IsNewNode="True">
+			<Columns IsNewNode="True">
+				<ColumnInfo Id="File" MinWidth="180" IsNewNode="True" />
+				<ColumnInfo Id="Type" MinWidth="140" IsNewNode="True" />
+				<ColumnInfo Id="Description" MinWidth="220" IsNewNode="True" />
+				<ColumnInfo Id="UploadedAtUtc" MinWidth="140" IsNewNode="True" />
 			</Columns>
 		</ListView>
 		<DetailView Id="Department_DetailView">

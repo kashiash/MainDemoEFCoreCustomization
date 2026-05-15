@@ -39,6 +39,7 @@ public sealed class MainDemoModule : ModuleBase {
 
         this.AdditionalExportedTypes.Add(typeof(CustomNonPersistentObject));
         this.AdditionalExportedTypes.Add(typeof(UseSQLAlternativeInfo));
+        this.AdditionalExportedTypes.Add(typeof(DocumentFileUploadParameters));
     }
     public override void Setup(ApplicationModulesManager moduleManager) {
         base.Setup(moduleManager);
@@ -76,7 +77,9 @@ public sealed class MainDemoModule : ModuleBase {
                 typeof(PortfolioFileData),
                 typeof(Position),
                 typeof(Resume),
-                typeof(DynamicAppearanceRule)
+                typeof(DynamicAppearanceRule),
+                typeof(DocumentFile),
+                typeof(DocumentFileType)
             };
     }
 

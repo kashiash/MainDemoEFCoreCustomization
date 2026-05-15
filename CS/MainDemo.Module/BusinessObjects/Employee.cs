@@ -25,7 +25,7 @@ namespace MainDemo.Module.BusinessObjects;
    MessageTemplateMustBeReferenced = "The {TargetObject} object must not be referenced.")]
 [DefaultProperty(nameof(FullName))]
 [ImageName("BO_Person")]
-public class Employee : BaseObject {
+public class Employee : BaseObject, IHasDocumentFiles {
     public virtual String FirstName { get; set; }
 
     public virtual String LastName { get; set; }
@@ -92,6 +92,9 @@ public class Employee : BaseObject {
 
     [Aggregated]
     public virtual IList<Paycheck> Paychecks { get; set; } = new ObservableCollection<Paycheck>();
+
+    [Aggregated]
+    public virtual IList<DocumentFile> DocumentFiles { get; set; } = new ObservableCollection<DocumentFile>();
 
     [DataSourceProperty("Department.Employees", DataSourcePropertyIsNullMode.SelectAll), DataSourceCriteria("Position.Title = 'Manager' AND ID != '@This.ID'")]
     public virtual Employee Manager { get; set; }
