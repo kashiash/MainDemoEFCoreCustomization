@@ -52,3 +52,4 @@ Short ADR-style record of technical and workflow decisions.
 **Consequences**
 - Documentation changes should be reviewed not only technically, but also stylistically.
 - Future edits should favor simple, natural Polish over literal translations.
+- Future edits should prefer dense, direct wording with no filler and no emphasis words unless they add technical meaning.
