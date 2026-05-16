@@ -60,25 +60,47 @@ W tym repo seedowana jest przykładowa reguła:
 4. target: `Subject;DueDate;AssignedTo`,
 5. efekt: ciemnoczerwona czcionka + jasne tło.
 
-## Przykład encji reguły
+## Pełny kod z repo
 
-Najważniejsza klasa to:
+Poniżej jest pełny kod z repo. Nie ma tu wersji skróconej.
+
+### `DynamicAppearanceRule.cs`
+
+Plik:
 
 - [DynamicAppearanceRule.cs](C:/Users/Programista/source/repos/MainDemo.NET.EFCore/CS/MainDemo.Module/BusinessObjects/DynamicAppearanceRule.cs)
 
-To ona przechowuje dane reguły i wystawia je w formacie oczekiwanym przez XAF:
-
 ```csharp
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Drawing;
+using DevExpress.ExpressApp;
+using DevExpress.ExpressApp.ConditionalAppearance;
+using DevExpress.ExpressApp.Editors;
+using DevExpress.Persistent.Base;
+using DevExpress.Persistent.BaseImpl.EF;
+using MainDemo.Module.Storages;
+
+namespace MainDemo.Module.BusinessObjects;
+
 [DefaultClassOptions]
 [DefaultProperty(nameof(Name))]
 [ImageName("BO_Condition")]
 public class DynamicAppearanceRule : BaseObject, IAppearanceRuleProperties {
+    private const string DefaultCriteria = "True";
+    private const string DefaultTargetItems = "*";
+    private const string DefaultContext = "Any";
+    private const string DefaultAppearanceItemType = "ViewItem";
+
     [StringLength(256)]
     public virtual string Name { get; set; }
 
+    [Browsable(false)]
     [StringLength(512)]
     public virtual string ObjectTypeFullName { get; set; }
 
+    [Browsable(false)]
     [StringLength(256)]
     public virtual string ObjectTypeName { get; set; }
 
@@ -92,50 +114,151 @@ public class DynamicAppearanceRule : BaseObject, IAppearanceRuleProperties {
         }
     }
 
-    public virtual string Criteria { get; set; } = "True";
-    public virtual string TargetItems { get; set; } = "*";
-    public virtual string Context { get; set; } = "Any";
-    public virtual string AppearanceItemType { get; set; } = "ViewItem";
+    [Column(TypeName = "nvarchar(max)")]
+    public virtual string Criteria {
+        get;
+        set;
+    } = DefaultCriteria;
+
+    [StringLength(512)]
+    public virtual string TargetItems {
+        get;
+        set;
+    } = DefaultTargetItems;
+
+    [StringLength(128)]
+    public virtual string Context {
+        get;
+        set;
+    } = DefaultContext;
+
+    [StringLength(128)]
+    public virtual string AppearanceItemType {
+        get;
+        set;
+    } = DefaultAppearanceItemType;
+
+    [StringLength(256)]
     public virtual string ViewId { get; set; }
+
     public virtual int Priority { get; set; }
+
+    public virtual ViewItemVisibility? Visibility { get; set; }
+
+    public virtual bool? Enabled { get; set; }
+
+    [StringLength(64)]
+    [Browsable(false)]
+    public virtual string FontColorCss { get; set; }
+
+    [StringLength(64)]
+    [Browsable(false)]
+    public virtual string BackColorCss { get; set; }
+
+    [StringLength(128)]
+    public virtual string CssClass { get; set; }
+
+    [StringLength(128)]
+    public virtual string Method { get; set; }
+
+    public virtual DevExpress.Drawing.DXFontStyle? FontStyle { get; set; }
+
+    [NotMapped]
+    [Browsable(false)]
+    public Type DeclaringType => DataType;
+
+    [NotMapped]
+    public Color? FontColor {
+        get => ParseColor(FontColorCss);
+        set => FontColorCss = ToCssColor(value);
+    }
+
+    [NotMapped]
+    public Color? BackColor {
+        get => ParseColor(BackColorCss);
+        set => BackColorCss = ToCssColor(value);
+    }
+
+    public override void OnSaving() {
+        base.OnSaving();
+        var objectSpace = ((IObjectSpaceLink)this).ObjectSpace;
+        if(objectSpace != null && objectSpace.IsDeletedObject(this)) {
+            DynamicAppearanceRuleStorage.Remove(this);
+        }
+        else {
+            DynamicAppearanceRuleStorage.Put(this);
+        }
+    }
+
+    public bool Matches(Type objectType, string viewId) {
+        if(objectType == null) {
+            return false;
+        }
+        var currentTypeName = NormalizeTypeName(objectType.Name);
+        if(!string.Equals(ObjectTypeName, currentTypeName, StringComparison.Ordinal)) {
+            return false;
+        }
+        return string.IsNullOrWhiteSpace(ViewId) || string.Equals(ViewId, viewId, StringComparison.Ordinal);
+    }
+
+    internal static string NormalizeTypeName(string typeName) {
+        const string proxySuffix = "Proxy";
+        if(string.IsNullOrWhiteSpace(typeName)) {
+            return typeName;
+        }
+        return typeName.EndsWith(proxySuffix, StringComparison.Ordinal)
+            ? typeName[..^proxySuffix.Length]
+            : typeName;
+    }
+
+    private static Color? ParseColor(string cssColor) {
+        if(string.IsNullOrWhiteSpace(cssColor)) {
+            return null;
+        }
+        try {
+            return ColorTranslator.FromHtml(cssColor);
+        }
+        catch {
+            return null;
+        }
+    }
+
+    private static string ToCssColor(Color? color) {
+        if(color == null) {
+            return null;
+        }
+        return ColorTranslator.ToHtml(color.Value);
+    }
 }
 ```
 
-W tej klasie są też pola dla kolorów, `CssClass`, `Method`, `FontStyle`, `Visibility` i `Enabled`, ale powyższy fragment pokazuje najważniejszy rdzeń.
+### `DynamicAppearanceRuleStorage.cs`
 
-Istotny jest też zapis do cache przy `OnSaving()`:
-
-```csharp
-public override void OnSaving() {
-    base.OnSaving();
-    var objectSpace = ((IObjectSpaceLink)this).ObjectSpace;
-    if(objectSpace != null && objectSpace.IsDeletedObject(this)) {
-        DynamicAppearanceRuleStorage.Remove(this);
-    }
-    else {
-        DynamicAppearanceRuleStorage.Put(this);
-    }
-}
-```
-
-To oznacza, że reguła po zapisie aktualizuje cache bez czekania na restart aplikacji.
-
-## Przykład storage
-
-Drugą klasą jest:
+Plik:
 
 - [DynamicAppearanceRuleStorage.cs](C:/Users/Programista/source/repos/MainDemo.NET.EFCore/CS/MainDemo.Module/Storages/DynamicAppearanceRuleStorage.cs)
 
-To prosty cache procesowy:
-
 ```csharp
+using DevExpress.ExpressApp.ConditionalAppearance;
+using MainDemo.Module.BusinessObjects;
+
+namespace MainDemo.Module.Storages;
+
 public static class DynamicAppearanceRuleStorage {
     private static readonly Lock SyncRoot = new();
     private static List<DynamicAppearanceRule> rules = new();
 
     public static void Initialize(IEnumerable<DynamicAppearanceRule> sourceRules) {
         lock(SyncRoot) {
-            rules = sourceRules.Where(rule => rule != null).ToList();
+            rules = sourceRules
+                .Where(rule => rule != null)
+                .ToList();
+        }
+    }
+
+    public static IReadOnlyList<DynamicAppearanceRule> GetRules() {
+        lock(SyncRoot) {
+            return rules.ToList();
         }
     }
 
@@ -147,26 +270,47 @@ public static class DynamicAppearanceRuleStorage {
                 .ToList();
         }
     }
+
+    public static void Put(DynamicAppearanceRule rule) {
+        if(rule == null) {
+            return;
+        }
+        lock(SyncRoot) {
+            var index = rules.FindIndex(existing => existing.ID == rule.ID);
+            if(index >= 0) {
+                rules[index] = rule;
+            }
+            else {
+                rules.Add(rule);
+            }
+        }
+    }
+
+    public static void Remove(DynamicAppearanceRule rule) {
+        if(rule == null) {
+            return;
+        }
+        lock(SyncRoot) {
+            rules.RemoveAll(existing => existing.ID == rule.ID);
+        }
+    }
 }
 ```
 
-To jest celowo proste rozwiązanie:
+### `DynamicAppearanceRuleViewController.cs`
 
-1. szybkie,
-2. łatwe do debugowania,
-3. wystarczające dla pojedynczej instancji aplikacji.
-
-Jeżeli aplikacja działa w wielu instancjach, taki cache nie synchronizuje się sam.
-
-## Przykład kontrolera integrującego z XAF
-
-Trzecia klasa to:
+Plik:
 
 - [DynamicAppearanceRuleViewController.cs](C:/Users/Programista/source/repos/MainDemo.NET.EFCore/CS/MainDemo.Module/Controllers/DynamicAppearanceRuleViewController.cs)
 
-To ona dokłada reguły z cache do standardowego `AppearanceController`:
-
 ```csharp
+using DevExpress.ExpressApp;
+using DevExpress.ExpressApp.ConditionalAppearance;
+using DevExpress.ExpressApp.SystemModule;
+using MainDemo.Module.Storages;
+
+namespace MainDemo.Module.Controllers;
+
 public class DynamicAppearanceRuleViewController : ObjectViewController<ObjectView, object> {
     private AppearanceController appearanceController;
 
@@ -181,7 +325,18 @@ public class DynamicAppearanceRuleViewController : ObjectViewController<ObjectVi
         appearanceController.Refresh();
     }
 
+    protected override void OnDeactivated() {
+        if(appearanceController != null) {
+            appearanceController.CollectAppearanceRules -= AppearanceController_CollectAppearanceRules;
+            appearanceController = null;
+        }
+        base.OnDeactivated();
+    }
+
     private void AppearanceController_CollectAppearanceRules(object sender, CollectAppearanceRulesEventArgs e) {
+        if(View?.ObjectTypeInfo?.Type == null) {
+            return;
+        }
         foreach(var rule in DynamicAppearanceRuleStorage.GetRules(View.ObjectTypeInfo.Type, View.Id)) {
             e.AppearanceRules.Add(rule);
         }
@@ -189,7 +344,173 @@ public class DynamicAppearanceRuleViewController : ObjectViewController<ObjectVi
 }
 ```
 
-To jest właściwe miejsce, w którym mechanizm zaczyna działać. Sama encja w bazie niczego jeszcze nie zmienia w UI.
+### `MainDemoDbContext.cs`
+
+Plik:
+
+- [MainDemoDbContext.cs](C:/Users/Programista/source/repos/MainDemo.NET.EFCore/CS/MainDemo.Module/BusinessObjects/MainDemoDbContext.cs)
+
+Pełny fragment związany z appearance:
+
+```csharp
+modelBuilder.Entity<DocumentFile>()
+    .HasOne(documentFile => documentFile.Employee)
+    .WithMany(employee => employee.DocumentFiles)
+    .OnDelete(DeleteBehavior.Cascade);
+modelBuilder.Entity<DocumentFile>()
+    .HasOne(documentFile => documentFile.DemoTask)
+    .WithMany(task => task.DocumentFiles)
+    .OnDelete(DeleteBehavior.Cascade);
+modelBuilder.Entity<DocumentFile>()
+    .Property(documentFile => documentFile.UploadedAtUtc)
+    .HasColumnType("datetime2");
+```
+
+oraz:
+
+```csharp
+public DbSet<DynamicAppearanceRule> DynamicAppearanceRules { get; set; }
+```
+
+### `MainDemoModule.cs`
+
+Plik:
+
+- [MainDemoModule.cs](C:/Users/Programista/source/repos/MainDemo.NET.EFCore/CS/MainDemo.Module/MainDemoModule.cs)
+
+Pełny fragment integracji:
+
+```csharp
+this.RequiredModuleTypes.Add(typeof(DevExpress.ExpressApp.ConditionalAppearance.ConditionalAppearanceModule));
+```
+
+oraz:
+
+```csharp
+protected override IEnumerable<Type> GetDeclaredExportedTypes() {
+    return new Type[] {
+            typeof(Address),
+            typeof(Country),
+            typeof(DevExpress.Persistent.BaseImpl.EF.Event),
+            typeof(DevExpress.Persistent.BaseImpl.EF.ReportDataV2),
+            typeof(Note),
+            typeof(Employee),
+            typeof(DemoTask),
+            typeof(Department),
+            typeof(Location),
+            typeof(Paycheck),
+            typeof(PhoneNumber),
+            typeof(PortfolioFileData),
+            typeof(Position),
+            typeof(Resume),
+            typeof(DynamicAppearanceRule),
+            typeof(DocumentFile),
+            typeof(DocumentFileType)
+        };
+}
+```
+
+oraz:
+
+```csharp
+public override void Setup(XafApplication application) {
+    base.Setup(application);
+    application.SetupComplete += Application_SetupComplete;
+}
+
+private void Application_SetupComplete(object sender, EventArgs e) {
+    if(sender is not XafApplication application) {
+        return;
+    }
+    using var objectSpace = application.CreateObjectSpace(typeof(DynamicAppearanceRule));
+    DynamicAppearanceRuleStorage.Initialize(objectSpace.GetObjects<DynamicAppearanceRule>());
+}
+```
+
+### `Updater.cs`
+
+Plik:
+
+- [Updater.cs](C:/Users/Programista/source/repos/MainDemo.NET.EFCore/CS/MainDemo.Module/DatabaseUpdate/Updater.cs)
+
+Pełny fragment seedu:
+
+```csharp
+private void EnsureDynamicAppearanceRules() {
+    if(ObjectSpace.FirstOrDefault<DynamicAppearanceRule>(rule => rule.Name == "Highlight overdue tasks") != null) {
+        return;
+    }
+
+    var rule = ObjectSpace.CreateObject<DynamicAppearanceRule>();
+    rule.Name = "Highlight overdue tasks";
+    rule.DataType = typeof(DemoTask);
+    rule.Criteria = "Status != ##Enum#MainDemo.Module.BusinessObjects.TaskStatus,Completed# && DueDate < LocalDateTimeToday()";
+    rule.TargetItems = "Subject;DueDate;AssignedTo";
+    rule.Context = "Any";
+    rule.AppearanceItemType = nameof(ViewItem);
+    rule.Priority = 10;
+    rule.FontColor = Color.Firebrick;
+    rule.BackColor = Color.MistyRose;
+    rule.CssClass = "overdue-task";
+}
+```
+
+### `DynamicAppearanceRuleTests.cs`
+
+Plik:
+
+- [DynamicAppearanceRuleTests.cs](C:/Users/Programista/source/repos/MainDemo.NET.EFCore/CS/MainDemo.WebAPI.Tests/DynamicAppearanceRuleTests.cs)
+
+Pełny kod:
+
+```csharp
+using DevExpress.ExpressApp;
+using MainDemo.Module.BusinessObjects;
+using MainDemo.Module.Storages;
+using MainDemo.WebAPI.TestInfrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Xunit;
+
+namespace MainDemo.WebAPI.Tests;
+
+public class DynamicAppearanceRuleTests : BaseWebApiTest {
+    public DynamicAppearanceRuleTests(SharedTestHostHolder fixture) : base(fixture) { }
+
+    [Fact]
+    public void Seeded_dynamic_appearance_rule_exists_in_database() {
+        using var scope = fixture.Host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+        scope.ServiceProvider.Authenticate("Sam");
+        using var objectSpace = scope.ServiceProvider
+            .GetRequiredService<IObjectSpaceFactory>()
+            .CreateObjectSpace<DynamicAppearanceRule>();
+
+        var rule = objectSpace.FirstOrDefault<DynamicAppearanceRule>(x => x.Name == "Highlight overdue tasks");
+
+        Assert.NotNull(rule);
+        Assert.Equal(typeof(DemoTask), rule.DataType);
+        Assert.Equal("Subject;DueDate;AssignedTo", rule.TargetItems);
+        Assert.Equal("Any", rule.Context);
+        Assert.Equal("ViewItem", rule.AppearanceItemType);
+        Assert.Equal(System.Drawing.Color.Firebrick, rule.FontColor);
+    }
+
+    [Fact]
+    public void Storage_returns_rules_only_for_matching_type() {
+        using var scope = fixture.Host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+        scope.ServiceProvider.Authenticate("Sam");
+        using var objectSpace = scope.ServiceProvider
+            .GetRequiredService<IObjectSpaceFactory>()
+            .CreateObjectSpace<DynamicAppearanceRule>();
+        DynamicAppearanceRuleStorage.Initialize(objectSpace.GetObjects<DynamicAppearanceRule>());
+
+        var taskRules = DynamicAppearanceRuleStorage.GetRules(typeof(DemoTask), "AnyView");
+        Assert.Contains(taskRules, rule => rule.DeclaringType == typeof(DemoTask));
+
+        var employeeRules = DynamicAppearanceRuleStorage.GetRules(typeof(Employee), "AnyView");
+        Assert.DoesNotContain(employeeRules, rule => rule.DeclaringType == typeof(DemoTask));
+    }
+}
+```
 
 ## Minimalny zestaw do przeniesienia do innego projektu XAF
 

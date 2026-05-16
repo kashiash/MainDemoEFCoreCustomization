@@ -1,132 +1,146 @@
 # Branding DataDrive w MainDemo.Blazor.Server
 
-Ten dokument opisuje konkretną zmianę brandingu, którą zrobiłem w tym repo. Nie jest to teoria z artykułu, tylko zapis tego, co dokładnie zostało podmienione w `MainDemo.NET.EFCore`, z plikami źródłowymi, fragmentami przed/po i miejscem, skąd wzięte zostały assety.
+Ten dokument pokazuje dokładnie, co zmieniłem w `MainDemo.Blazor.Server`, żeby podmienić branding na DataDrive.
 
-## Co było celem
+## Zakres zmiany
 
-Aplikacja `MainDemo.Blazor.Server` jechała na domyślnym XAF-owym brandingu („XAF Blazor Demo”, Logo + SplashScreen, brak pre-loadera). Chodziło o przeniesienie kompletu brandingowego z `OutlookInspiredDemo` (DataDrive / Fleet Management Software) tak, żeby wszystkie trzy stany ładowania — preload, splash, header — wyglądały spójnie.
+Zmiana objęła:
 
-Pattern i lessons-learned pochodzą z artykułu [Branding w Blazorze: logo, splash screen i motywy](https://kashiash.github.io/) (`2026-05-12-branding-blazor.markdown`).
+1. assety SVG w `wwwroot/images`,
+2. host `_Host.cshtml`,
+3. style w `site.css`,
+4. domyślny motyw w `appsettings.json`.
 
-## Skąd pliki
+## Pliki graficzne
 
-Wszystko z lokalnego repo `C:\Users\Programista\source\repos\OutlookInspiredDemo`, gałąź DataDrive.Blazor.Server:
-
-- `CS\DataDrive.Blazor.Server\wwwroot\images\Logo.svg`
-- `CS\DataDrive.Blazor.Server\wwwroot\images\SplashScreen.svg`
-- `CS\DataDrive.Blazor.Server\wwwroot\images\fleet-management-software.svg`
-
-## Krok 1 — assety SVG
-
-### Pliki
-
-Wrzucone do `CS\MainDemo.Blazor.Server\wwwroot\images\`:
+Do `CS/MainDemo.Blazor.Server/wwwroot/images/` trafiły:
 
 ```text
-Logo.svg                          # wordmark "DATADRIVE" do headera (mask), viewBox 0 0 2872 347
-SplashScreen.svg                  # właściwy splash (środek loadera)
-fleet-management-software.svg     # szeroki znak przed spinnerem (pre-loader)
+Logo.svg
+SplashScreen.svg
+fleet-management-software.svg
 ```
 
-### Dlaczego trzy
+Role tych plików są różne:
 
-- `Logo.svg` jest renderowany przez maskę CSS w headerze — kolor bierze z `currentColor`, więc musi to być monochromatyczny SVG.
-- `fleet-management-software.svg` jest tłem `pre-loading-image` (full-size znak przed spinnerem).
-- `SplashScreen.svg` jedzie do komponentu `SplashScreen` XAF-owego z `param-ImagePath`.
+1. `Logo.svg` idzie do nagłówka przez CSS maskę,
+2. `SplashScreen.svg` idzie do komponentu `SplashScreen`,
+3. `fleet-management-software.svg` idzie do preloadera przed spinnerem.
 
-Wcześniej w MainDemo siedziały tylko `Logo.svg` i `SplashScreen.svg` — pre-loadera nie było wcale.
+## Plik 1. `CS/MainDemo.Blazor.Server/Pages/_Host.cshtml`
 
-### Dlaczego nie trzeba ruszać `.csproj`
+To jest dokładna zawartość po zmianie:
 
-`MainDemo.Blazor.Server.csproj` ma już:
+```cshtml
+@page "/"
+@namespace MainDemo.Blazor.Server
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using DevExpress.ExpressApp.Blazor.Components
 
-```xml
-<Content Include="wwwroot\**\*.*" CopyToPublishDirectory="PreserveNewest" />
-```
+<!DOCTYPE html>
+<html lang="en">
 
-więc dorzucenie pliku do `wwwroot\images\` wystarczy.
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="description" content="This demo allows you to store contacts, tasks, events, reports and other related data. It includes reusable XAF modules such Reports, Office, Scheduler, View Variants, AuditTrail, FileAttachments." />
+    <meta name="keywords" content="DevExpress, Blazor, Security, Authentication, Authorization, Web, Service, API, Cloud, EF Core, Access Control, RBAC, Swagger, OData, Reporting, Dashboard, Validation, Audit Trail, Office, File Management" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="DataDrive" />
+    <meta property="og:description" content="This demo allows you to store contacts, tasks, events, reports and other related data. It includes reusable XAF modules such Reports, Office, Scheduler, View Variants, AuditTrail, FileAttachments." />
+    <meta property="og:image" content="https://www.devexpress.com/support/demos/i/demo-thumbs/xaf-main-demo.png" />
+    <meta property="og:url" content="https://demos.devexpress.com/XAF/BlazorMainDemo" />
+    <title>DataDrive</title>
+    <base href="~/" />
+    <!-- Google Tag Manager -->
+    <script>
+        (function(w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-TP4P4KW');
+    </script>
+    <!-- End Google Tag Manager -->
+    <component type="typeof(BootstrapThemeLink)" render-mode="Static" />
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+        <iframe src='https://www.googletagmanager.com/ns.html?id=GTM-TP4P4KW'
+                height='0' width='0' style='display:none;visibility:hidden'></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <div id="preApplicationLoadingPanel" class="pre-loading-panel">
+        <div class="pre-loading-image" role="img" aria-label="Fleet Management Software"></div>
+    </div>
+    <component type="typeof(SplashScreen)" render-mode="Static" param-Caption='"Fleet Management Software"' param-ImagePath='"images/SplashScreen.svg"' />
 
-## Krok 2 — `_Host.cshtml`
+    <link href="_content/DevExpress.ExpressApp.Blazor/styles.css" asp-append-version="true" rel="stylesheet" />
+    <link href="css/site.css" rel="stylesheet" />
 
-### Plik
+    <app class="d-none">
+        <component type="typeof(App)" render-mode="Server" />
+    </app>
 
-- `CS\MainDemo.Blazor.Server\Pages\_Host.cshtml`
+    <component type="typeof(AlertsHandler)" render-mode="Server" />
 
-### Tytuł i og:title
+    <div id="blazor-error-ui" data-nosnippet>
+        <component type="typeof(BlazorError)" render-mode="Static" />
+    </div>
 
-Było:
-
-```html
-<meta property="og:title" content="XAF Blazor Demo" />
-...
-<title>XAF Blazor Demo</title>
-```
-
-Jest:
-
-```html
-<meta property="og:title" content="DataDrive" />
-...
-<title>DataDrive</title>
-```
-
-Zostawiłem `og:description`, `og:image`, `og:url` — to są techniczne odnośniki do demosów DevExpressa, ich zmiana nie wnosi nic do brandingu w aplikacji.
-
-### Pre-loader
-
-W oryginale nie było pre-loadera w ogóle — `SplashScreen` był jedyną planszą startową. Dodałem strukturę z DataDrive, dokładnie nad komponentem `SplashScreen`:
-
-```html
-<!-- End Google Tag Manager (noscript) -->
-<div id="preApplicationLoadingPanel" class="pre-loading-panel">
-    <div class="pre-loading-image" role="img" aria-label="Fleet Management Software"></div>
-</div>
-<component type="typeof(SplashScreen)" render-mode="Static" param-Caption='"Fleet Management Software"' param-ImagePath='"images/SplashScreen.svg"' />
-```
-
-Zmiany w tej sekcji:
-
-- nowy `<div id="preApplicationLoadingPanel">` z `pre-loading-image` (tło = `fleet-management-software.svg`),
-- `aria-label="Fleet Management Software"` — żeby czytniki ekranu nie czytały już „XAF Blazor Demo”,
-- `param-Caption` w `SplashScreen` zmieniony z `"XAF Blazor Demo"` na `"Fleet Management Software"`.
-
-### Skrypt ukrywający pre-loader
-
-Tuż przed `_framework/blazor.server.js`:
-
-```html
-<script>
-    window.setTimeout(function() {
-        var preLoadingPanel = document.getElementById('preApplicationLoadingPanel');
-        if (!preLoadingPanel) {
-            return;
-        }
-
-        preLoadingPanel.classList.add('pre-loading-hide');
+    <script>
         window.setTimeout(function() {
-            preLoadingPanel.remove();
-        }, 250);
-    }, 1400);
-</script>
+            var preLoadingPanel = document.getElementById('preApplicationLoadingPanel');
+            if (!preLoadingPanel) {
+                return;
+            }
+
+            preLoadingPanel.classList.add('pre-loading-hide');
+            window.setTimeout(function() {
+                preLoadingPanel.remove();
+            }, 250);
+        }, 1400);
+    </script>
+    <script src="_framework/blazor.server.js"></script>
+    <script src="js/file-download.js"></script>
+    <script src="js/scripts.js"></script>
+</body>
+</html>
 ```
 
-To jest dokładnie ten sam mechanizm co w DataDrive: po 1.4 s pre-loader dostaje `pre-loading-hide` (płynne wygaszenie), po kolejnych 250 ms znika z DOM-a. Bez tego skryptu pełny znak `fleet-management-software.svg` zostałby przykryty przez `applicationLoadingPanel` XAF-a, ale wisiałby w DOM-ie do końca sesji.
+Najważniejsze zmiany:
 
-## Krok 3 — `site.css`
+1. `<title>` i `og:title` zmieniły się na `DataDrive`,
+2. doszedł `preApplicationLoadingPanel`,
+3. `SplashScreen` dostał `param-Caption='"Fleet Management Software"'`,
+4. doszedł skrypt, który wygasza i usuwa preloader.
 
-### Plik
+## Plik 2. `CS/MainDemo.Blazor.Server/wwwroot/css/site.css`
 
-- `CS\MainDemo.Blazor.Server\wwwroot\css\site.css`
-
-### `body { margin: 0 }`
-
-Pre-loading panel używa `position: fixed; inset: 0` — bez `body { margin: 0 }` Bootstrap zostawia 8 px marginesu i panel ma cienki pasek po krawędziach.
-
-### Nowe sekcje
-
-Dodane między `app { ... }` a `.header-logo` (cały blok przeniesiony 1:1 z DataDrive):
+To jest dokładny blok stylów, który robi branding:
 
 ```css
+html, body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+}
+
+app {
+    display: block;
+    height: 100%;
+}
+
+.adsbox {
+    top: 0;
+}
+
 .pre-loading-panel {
     position: fixed;
     inset: 0;
@@ -149,32 +163,7 @@ Dodane między `app { ... }` a `.header-logo` (cały blok przeniesiony 1:1 z Dat
     height: min(24vw, 220px);
     background: transparent url('../images/fleet-management-software.svg') center center / contain no-repeat;
 }
-```
 
-`z-index: 100002` jest celowo wyższy niż `100001` z `#blazor-error-ui` — pre-loader musi zasłaniać wszystko, łącznie z błędem hostingu.
-
-### `.header-logo` — zmieniona geometria i alignment
-
-Było (MainDemo):
-
-```css
-.header-logo {
-    flex-shrink: 0;
-    background-color: currentColor;
-    -webkit-mask: url('../images/Logo.svg');
-    mask: url('../images/Logo.svg');
-    -webkit-mask-position: left;
-    mask-position: left;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    width: 164px;
-    height: 18px;
-}
-```
-
-Jest:
-
-```css
 .header-logo {
     flex-shrink: 0;
     background-color: currentColor;
@@ -187,84 +176,155 @@ Jest:
     width: 210px;
     height: 24px;
 }
+
+#applicationLoadingPanel .loading {
+    width: 360px;
+    height: 360px;
+}
+
+#applicationLoadingPanel .loading-image-wrapper {
+    width: 220px;
+    height: 220px;
+    min-width: 220px;
+    min-height: 220px;
+    background-color: transparent !important;
+    border-radius: 50%;
+}
+
+#applicationLoadingPanel .loading-image {
+    width: 180px;
+    height: 180px;
+    object-fit: contain;
+}
+
+#applicationLoadingPanel .loading-border {
+    width: 220px !important;
+    height: 220px !important;
+    min-width: 220px !important;
+    min-height: 220px !important;
+    border-width: 8px !important;
+    border-radius: 50% !important;
+    box-sizing: border-box;
+}
+
+#applicationLoadingPanel .loading-floated-circle {
+    width: 220px !important;
+    height: 220px !important;
+    min-width: 220px !important;
+    min-height: 220px !important;
+    border: none !important;
+    border-radius: 50% !important;
+    box-sizing: border-box;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg 300deg,
+        var(--dxds-color-border-primary-default-rest, var(--bs-primary)) 300deg 360deg
+    ) !important;
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #000 calc(100% - 8px)) !important;
+    mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #000 calc(100% - 8px)) !important;
+}
+
+#applicationLoadingPanel .loading-caption {
+    display: none !important;
+}
+
+#logon-template-component .header-logo {
+    -webkit-mask-position: center;
+    mask-position: center;
+}
 ```
 
-Zmiany:
+Ten blok odpowiada za:
 
-- `mask-position`: `left` → `center` — wordmark DATADRIVE jest dużo szerszy w proporcjach niż poprzedni „XAF Blazor Demo”; przy `left` obcina się na końcach kontenera headera.
-- `width/height`: `164×18` → `210×24` — dopasowane do nowego wordmark.
+1. pełnoekranowy preloader,
+2. płynne wygaszenie preloadera,
+3. szerokie logo przed spinnerem,
+4. geometrię logo w nagłówku,
+5. rozmiary i wygląd splasha.
 
-Wyleciał też zduplikowany przeze mnie wcześniej fragment `#logon-template-component .header-logo { mask-position: center }` — przy globalnym `center` jest już zbędny. Nie usuwałem go w tej zmianie, bo nie szkodzi.
+## Plik 3. `CS/MainDemo.Blazor.Server/appsettings.json`
 
-### `#applicationLoadingPanel .loading*` — kontrola właściwego splasha
-
-XAF generuje wokół `SplashScreen.svg` zewnętrzny okrągły wskaźnik postępu (`.loading-floated-circle`). Domyślne rozmiary nie pasują do nowego splash SVG. Dodany blok ustawia:
-
-- całość `.loading` na 360×360 px,
-- okrąg `.loading-floated-circle` jako `conic-gradient` (300° transparent + 60° kolor primary) z maską radialną → cienki, animowany łuk,
-- `.loading-image` na 180×180 px, `object-fit: contain` — żeby SVG się nie przyciął ani nie rozjechał proporcjami,
-- `.loading-caption { display: none }` — caption „Fleet Management Software” przy splash, jest już nad SVG, więc tekstu pod nim nie chcemy.
-
-Pełny blok jest skopiowany 1:1 z `OutlookInspiredDemo\CS\DataDrive.Blazor.Server\wwwroot\css\site.css`.
-
-## Krok 4 — `appsettings.json`, theme switcher
-
-### Plik
-
-- `CS\MainDemo.Blazor.Server\appsettings.json`
-
-### Zmiana
-
-Było:
-
-```json
-"ThemeSwitcher": {
-  "DefaultItemName": "DevExpress Fluent",
-```
-
-Jest:
+Branding zahaczył też o domyślny motyw:
 
 ```json
 "ThemeSwitcher": {
   "DefaultItemName": "Office White",
+  "ShowSizeModeSwitcher": true,
+  "Groups": [
+    {
+      "IsFluent": true,
+      "Caption": "DevExpress Fluent",
+      "Items": [
+        { "Caption": "Blue", "Color": "Blue" },
+        { "Caption": "Cool Blue", "Color": "CoolBlue" },
+        { "Caption": "Desert", "Color": "Desert" },
+        { "Caption": "Mint", "Color": "Mint" },
+        { "Caption": "Moss", "Color": "Moss" },
+        { "Caption": "Orchid", "Color": "Orchid" },
+        { "Caption": "Purple", "Color": "Purple" },
+        { "Caption": "Rose", "Color": "Rose" },
+        { "Caption": "Rust", "Color": "Rust" },
+        { "Caption": "Steel", "Color": "Steel" },
+        { "Caption": "Storm", "Color": "Storm" }
+      ]
+    },
+    {
+      "Caption": "DevExpress Classic",
+      "Items": [
+        {
+          "Caption": "Blazing Berry",
+          "Url": "_content/DevExpress.Blazor.Themes/blazing-berry.bs5.min.css",
+          "Color": "#5c2d91"
+        },
+        {
+          "Caption": "Blazing Dark",
+          "Url": "_content/DevExpress.Blazor.Themes/blazing-dark.bs5.min.css",
+          "Color": "#46444a"
+        },
+        {
+          "Caption": "Office White",
+          "Url": "_content/DevExpress.Blazor.Themes/office-white.bs5.min.css",
+          "Color": "#fe7109"
+        },
+        {
+          "Caption": "Purple",
+          "Url": "_content/DevExpress.Blazor.Themes/purple.bs5.min.css",
+          "Color": "#7989ff"
+        }
+      ]
+    }
+  ]
+}
 ```
 
-Pozostałe grupy (DevExpress Fluent + DevExpress Classic) zostały bez zmian — wciąż widzimy obie listy w prawej części headera, ale domyślnym motywem jest „Office White”, czyli to samo co w DataDrive (i to, co rekomenduje DevExpress w BC `T1090666`).
+Najważniejsza zmiana:
 
-Dlaczego to ma znaczenie: artykuł zwraca uwagę, że theme switcher też jest częścią brandingu. Jeśli nowy znak DATADRIVE wskakuje na ciemnym Fluent-Storm, to przez sekundę człowiek widzi „logo X na motywie Y”, a powinien widzieć od razu spójny ekran.
+```json
+"DefaultItemName": "Office White"
+```
 
-## Krok 5 — uruchomienie
+## Jak uruchomić po zmianie
 
 ```powershell
 dotnet build CS\MainDemo.Blazor.Server\MainDemo.Blazor.Server.csproj -c Debug
 dotnet run --project CS\MainDemo.Blazor.Server\MainDemo.Blazor.Server.csproj -c Debug --urls http://localhost:5115
 ```
 
-Co sprawdzić w przeglądarce (twarde przeładowanie, żeby ominąć cache CSS):
+## Co sprawdzić w przeglądarce
 
-1. **Karta przeglądarki** — tytuł `DataDrive`, nie `XAF Blazor Demo`.
-2. **Pre-loader** — natychmiast po wejściu, biały (lub w kolorze powierzchni motywu) ekran z szerokim znakiem `fleet-management-software`. Znika płynnie po ~1.4 s.
-3. **Splash** — w środku `SplashScreen.svg` opasany cienkim łukiem postępu, bez podpisu pod ikoną.
-4. **Po zalogowaniu** — w headerze wordmark DATADRIVE w kolorze tekstu motywu, 210×24, wycentrowany.
-5. **Theme switcher** — domyślnie „Office White”.
+1. karta ma tytuł `DataDrive`,
+2. na starcie widać `fleet-management-software.svg`,
+3. splash używa `SplashScreen.svg`,
+4. w nagłówku jest `Logo.svg`,
+5. domyślny motyw to `Office White`.
 
-## Lista zmienionych plików
+## Zmienione pliki
 
-- `CS\MainDemo.Blazor.Server\wwwroot\images\Logo.svg` (nowa zawartość — DATADRIVE wordmark)
-- `CS\MainDemo.Blazor.Server\wwwroot\images\SplashScreen.svg` (nowa zawartość — splash DataDrive)
-- `CS\MainDemo.Blazor.Server\wwwroot\images\fleet-management-software.svg` (nowy plik)
-- `CS\MainDemo.Blazor.Server\Pages\_Host.cshtml`
-- `CS\MainDemo.Blazor.Server\wwwroot\css\site.css`
-- `CS\MainDemo.Blazor.Server\appsettings.json`
-
-## Czego nie zmieniłem (i dlaczego)
-
-- `MainDemo.Module\Model.DesignedDiffs.xafml` i `MainDemoBlazorApplication.ApplicationName = "MainDemo"` — to identyfikator aplikacji w bazie (CheckCompatibilityType.DatabaseSchema), nie tekst na ekranie. Zmiana zerwałaby ciągłość modelu w istniejącej bazie `MainDemo.EFCore_v25.2`.
-- Bloki `og:description`, `og:image`, `og:url` w `_Host.cshtml` — wskazują na publiczny demo XAF-a na CDN DevExpressa. Bez własnego hostingu obrazka OG nie ma sensu ich ruszać.
-- `MainDemo.Win` (WinForms) — branding desktopowy jedzie przez `MainDemoWinApplication.cs` + `XafDemoSplashScreen` i `ExpressApp.ico`; to osobny temat poza tą zmianą.
-
-## Pułapki napotkane przy wdrożeniu
-
-- Pełny `dotnet build` potrafi się wywrócić na `MSB3026/MSB3027`, jeśli `MainDemo.Blazor.Server.exe` jest aktualnie uruchomione — pliki `bin\Debug\net9.0\MainDemo.Module.dll` i `*.resources.dll` są zalockowane. Kompilator C# leci, dopiero copy-step pada. Trzeba zatrzymać proces, potem rebuild.
-- `_Host.cshtml` jest hostowany przez `MapFallbackToPage("/_Host")` i renderowany Razorem — zmiany w nim wymagają restartu hosta (sam `dotnet watch` zwykle też to wykrywa, ale przy `dotnet run` trzeba ponownie odpalić aplikację).
-- Po podmianie SVG przeglądarka potrafi trzymać stary plik w cache. Sprawdzaj w trybie incognito albo `Ctrl+F5`.
+```text
+CS/MainDemo.Blazor.Server/wwwroot/images/Logo.svg
+CS/MainDemo.Blazor.Server/wwwroot/images/SplashScreen.svg
+CS/MainDemo.Blazor.Server/wwwroot/images/fleet-management-software.svg
+CS/MainDemo.Blazor.Server/Pages/_Host.cshtml
+CS/MainDemo.Blazor.Server/wwwroot/css/site.css
+CS/MainDemo.Blazor.Server/appsettings.json
+```
