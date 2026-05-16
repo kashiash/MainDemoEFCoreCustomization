@@ -12,20 +12,94 @@ Cel:
 
 Ten dokument pokazuje tylko ten wariant, który działa w tej aplikacji.
 
-## Co dokładnie trzeba dodać
+## Co trzeba dodać
 
-1. `DocumentFileType` jako słownik typów dokumentów,
-2. `DocumentFile` jako encję dokumentu,
-3. `IHasDocumentFiles` jako interfejs właściciela,
-4. `DocumentFiles` jako kolekcję na właścicielu,
-5. `DbSet` i relacje w `DbContext`,
-6. `DocumentFileUploadParameters` do popupu,
-7. `DocumentFileNestedListViewController` z akcją `Dodaj pliki`,
-8. `DocumentUploadAreaRenderer` z `DxUpload`,
-9. `DocumentFileUploadController` jako endpoint API,
-10. `DocumentPreviewRenderer` do podglądu PDF,
-11. wpis `DocumentFiles` do detail view właściciela,
-12. `DocumentFile_DetailView` z `PreviewFile`.
+Żeby to działało od początku do końca, trzeba dołożyć kilka elementów w czterech miejscach:
+
+1. w modelu danych,
+2. w `DbContext`,
+3. w warstwie XAF i Blazor,
+4. w modelu widoków.
+
+Każdy z tych elementów ma własną rolę. Poniżej jest to rozpisane w takiej kolejności, w jakiej nowy programista zwykle buduje taki mechanizm.
+
+### 1. Klasy danych
+
+Najpierw trzeba dodać klasy, które będą przechowywać dokumenty i typy dokumentów.
+
+- `DocumentFileType`
+  To słownik typów dokumentów, na przykład `Faktura`, `Umowa`, `Korespondencja`.
+  Użytkownik wybiera tę wartość przy dodawaniu pliku.
+
+- `DocumentFile`
+  To właściwa encja dokumentu.
+  Przechowuje plik, typ dokumentu, opis, datę dodania i dane potrzebne do podglądu.
+
+- `IHasDocumentFiles`
+  To interfejs dla obiektów, które mają mieć zakładkę `Załączniki`.
+  Dzięki temu jeden kontroler XAF może obsłużyć różne typy właścicieli dokumentów.
+
+- `DocumentFiles` na właścicielu
+  To kolekcja dokumentów na klasie takiej jak `Employee` albo `DemoTask`.
+  To właśnie ta kolekcja jest pokazywana użytkownikowi na zakładce `Załączniki`.
+
+- `DocumentFileUploadParameters`
+  To obiekt pomocniczy do popupu `Dodaj pliki`.
+  Trzyma tymczasowo typ dokumentu, opis i identyfikator właściciela, do którego mają zostać przypięte pliki.
+
+### 2. Rejestracja w bazie i `DbContext`
+
+Kiedy klasy już istnieją, trzeba powiedzieć EF Core, że mają być zapisane w bazie.
+
+- `DbSet<DocumentFile>`
+  Dzięki temu dokumenty stają się normalną tabelą w bazie danych.
+
+- `DbSet<DocumentFileType>`
+  Dzięki temu słownik typów dokumentów też trafia do bazy i może być używany z UI.
+
+- relacje `DocumentFile -> Employee` i `DocumentFile -> DemoTask`
+  Te relacje mówią EF Core, do jakiego właściciela należy dokument.
+  Bez nich kolekcja `DocumentFiles` na właścicielu nie będzie działała poprawnie.
+
+- mapowanie `UploadedAtUtc`
+  To zwykły detal bazy, ale warto go ustawić jawnie, żeby nie zostawiać typu kolumny przypadkowi providera.
+
+### 3. Warstwa XAF i Blazor
+
+Gdy model danych i baza są gotowe, trzeba dodać elementy, które użytkownik zobaczy i których użyje.
+
+- `DocumentFileNestedListViewController`
+  To kontroler XAF, który dodaje akcję `Dodaj pliki`.
+  On nie zapisuje plików sam.
+  Jego rola to:
+  1. pokazać akcję na nested liście dokumentów,
+  2. otworzyć popup,
+  3. przekazać do popupu informację, kto jest właścicielem dokumentów,
+  4. odświeżyć listę po zakończeniu uploadu.
+
+- `DocumentUploadAreaRenderer`
+  To komponent Blazor z `DxUpload`.
+  To on daje użytkownikowi możliwość przeciągnięcia naraz wielu plików, na przykład 20 PDF-ów.
+
+- `DocumentFileUploadController`
+  To endpoint HTTP, do którego `DxUpload` wysyła pliki.
+  Dla każdego pliku tworzy osobny rekord `DocumentFile`, przypina go do właściciela i zapisuje w bazie.
+
+- `DocumentPreviewRenderer`
+  To komponent odpowiedzialny za podgląd dokumentu.
+  Dla PDF osadza plik w `<object>`, więc renderowanie wykonuje standardowa przeglądarka PDF w browserze użytkownika.
+  Dla obrazów używa `<img>`.
+
+### 4. Model widoków
+
+Na końcu trzeba jeszcze włączyć to w UI XAF.
+
+- wpis `DocumentFiles` do detail view właściciela
+  Dzięki temu pojawia się zakładka albo sekcja `Załączniki`.
+  Bez tego użytkownik nie zobaczy listy dokumentów ani akcji `Dodaj pliki`.
+
+- `DocumentFile_DetailView` z `PreviewFile`
+  Dzięki temu po otwarciu konkretnego dokumentu użytkownik widzi nie tylko metadane, ale też podgląd PDF albo obrazu.
 
 ## Krok 1. Słownik typów dokumentów
 
