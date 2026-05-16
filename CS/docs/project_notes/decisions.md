@@ -33,3 +33,22 @@ Short ADR-style record of technical and workflow decisions.
 - `MainDemo.Module/BusinessObjects/Employee.cs`
 - `MainDemo.Module/BusinessObjects/DemoTask.cs`
 - `MainDemo.Module/Controllers/TaskActionsController.cs`
+
+## ADR-002: Polish documentation should avoid English calques (2026-05-16)
+
+**Status**: Accepted
+
+**Context**
+- User-facing technical documentation in this repository is written in Polish.
+- Literal translations from English reduce readability and make onboarding text sound unnatural.
+
+**Decision**
+- Prefer natural Polish phrasing in documentation.
+- Avoid direct calques such as "najprostsza kompletna ścieżka dodania" when a simpler Polish sentence communicates the same thing more clearly.
+
+**Alternatives Considered**
+- Keep mixed Polish-English phrasing as long as the meaning is understandable - rejected because it lowers documentation quality.
+
+**Consequences**
+- Documentation changes should be reviewed not only technically, but also stylistically.
+- Future edits should favor simple, natural Polish over literal translations.

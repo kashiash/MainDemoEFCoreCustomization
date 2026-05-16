@@ -1,6 +1,6 @@
 # Obsługa skanów i podglądu PDF w MainDemo Blazor
 
-To jest najprostsza ścieżka wdrożenia pełnej obsługi dokumentów w aplikacji XAF Blazor + EF Core.
+Ten dokument pokazuje, jak najprościej wdrożyć pełną obsługę dokumentów w aplikacji XAF Blazor + EF Core.
 
 Cel:
 
