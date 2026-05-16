@@ -31,6 +31,16 @@ To jest wariant pragmatyczny. Nie próbuje odwzorować wszystkiego z HIS jeden d
 4. seed przykładowej reguły,
 5. testy sprawdzające dane i filtrowanie.
 
+## Klasy, które faktycznie tworzą ten mechanizm
+
+Tutaj nie chodzi o ogólny pomysł, tylko o trzy konkretne klasy:
+
+1. `DynamicAppearanceRule` jako encja reguły i implementacja `IAppearanceRuleProperties`,
+2. `DynamicAppearanceRuleStorage` jako procesowy cache reguł,
+3. `DynamicAppearanceRuleViewController` jako punkt podpięcia do `AppearanceController`.
+
+Bez tych trzech elementów nie ma pełnego mechanizmu.
+
 ## Jak działa ten wariant
 
 Przepływ jest prosty:
@@ -49,6 +59,137 @@ W tym repo seedowana jest przykładowa reguła:
 3. kryterium: zadanie po terminie i nieukończone,
 4. target: `Subject;DueDate;AssignedTo`,
 5. efekt: ciemnoczerwona czcionka + jasne tło.
+
+## Przykład encji reguły
+
+Najważniejsza klasa to:
+
+- [DynamicAppearanceRule.cs](C:/Users/Programista/source/repos/MainDemo.NET.EFCore/CS/MainDemo.Module/BusinessObjects/DynamicAppearanceRule.cs)
+
+To ona przechowuje dane reguły i wystawia je w formacie oczekiwanym przez XAF:
+
+```csharp
+[DefaultClassOptions]
+[DefaultProperty(nameof(Name))]
+[ImageName("BO_Condition")]
+public class DynamicAppearanceRule : BaseObject, IAppearanceRuleProperties {
+    [StringLength(256)]
+    public virtual string Name { get; set; }
+
+    [StringLength(512)]
+    public virtual string ObjectTypeFullName { get; set; }
+
+    [StringLength(256)]
+    public virtual string ObjectTypeName { get; set; }
+
+    [NotMapped]
+    [ImmediatePostData]
+    public virtual Type DataType {
+        get => string.IsNullOrWhiteSpace(ObjectTypeFullName) ? null : Type.GetType(ObjectTypeFullName);
+        set {
+            ObjectTypeFullName = value?.AssemblyQualifiedName;
+            ObjectTypeName = value?.Name;
+        }
+    }
+
+    public virtual string Criteria { get; set; } = "True";
+    public virtual string TargetItems { get; set; } = "*";
+    public virtual string Context { get; set; } = "Any";
+    public virtual string AppearanceItemType { get; set; } = "ViewItem";
+    public virtual string ViewId { get; set; }
+    public virtual int Priority { get; set; }
+}
+```
+
+W tej klasie są też pola dla kolorów, `CssClass`, `Method`, `FontStyle`, `Visibility` i `Enabled`, ale powyższy fragment pokazuje najważniejszy rdzeń.
+
+Istotny jest też zapis do cache przy `OnSaving()`:
+
+```csharp
+public override void OnSaving() {
+    base.OnSaving();
+    var objectSpace = ((IObjectSpaceLink)this).ObjectSpace;
+    if(objectSpace != null && objectSpace.IsDeletedObject(this)) {
+        DynamicAppearanceRuleStorage.Remove(this);
+    }
+    else {
+        DynamicAppearanceRuleStorage.Put(this);
+    }
+}
+```
+
+To oznacza, że reguła po zapisie aktualizuje cache bez czekania na restart aplikacji.
+
+## Przykład storage
+
+Drugą klasą jest:
+
+- [DynamicAppearanceRuleStorage.cs](C:/Users/Programista/source/repos/MainDemo.NET.EFCore/CS/MainDemo.Module/Storages/DynamicAppearanceRuleStorage.cs)
+
+To prosty cache procesowy:
+
+```csharp
+public static class DynamicAppearanceRuleStorage {
+    private static readonly Lock SyncRoot = new();
+    private static List<DynamicAppearanceRule> rules = new();
+
+    public static void Initialize(IEnumerable<DynamicAppearanceRule> sourceRules) {
+        lock(SyncRoot) {
+            rules = sourceRules.Where(rule => rule != null).ToList();
+        }
+    }
+
+    public static IReadOnlyList<IAppearanceRuleProperties> GetRules(Type objectType, string viewId) {
+        lock(SyncRoot) {
+            return rules
+                .Where(rule => rule.Matches(objectType, viewId))
+                .Cast<IAppearanceRuleProperties>()
+                .ToList();
+        }
+    }
+}
+```
+
+To jest celowo proste rozwiązanie:
+
+1. szybkie,
+2. łatwe do debugowania,
+3. wystarczające dla pojedynczej instancji aplikacji.
+
+Jeżeli aplikacja działa w wielu instancjach, taki cache nie synchronizuje się sam.
+
+## Przykład kontrolera integrującego z XAF
+
+Trzecia klasa to:
+
+- [DynamicAppearanceRuleViewController.cs](C:/Users/Programista/source/repos/MainDemo.NET.EFCore/CS/MainDemo.Module/Controllers/DynamicAppearanceRuleViewController.cs)
+
+To ona dokłada reguły z cache do standardowego `AppearanceController`:
+
+```csharp
+public class DynamicAppearanceRuleViewController : ObjectViewController<ObjectView, object> {
+    private AppearanceController appearanceController;
+
+    protected override void OnActivated() {
+        base.OnActivated();
+        appearanceController = Frame.GetController<AppearanceController>();
+        if(appearanceController == null) {
+            return;
+        }
+        appearanceController.ResetRulesCache();
+        appearanceController.CollectAppearanceRules += AppearanceController_CollectAppearanceRules;
+        appearanceController.Refresh();
+    }
+
+    private void AppearanceController_CollectAppearanceRules(object sender, CollectAppearanceRulesEventArgs e) {
+        foreach(var rule in DynamicAppearanceRuleStorage.GetRules(View.ObjectTypeInfo.Type, View.Id)) {
+            e.AppearanceRules.Add(rule);
+        }
+    }
+}
+```
+
+To jest właściwe miejsce, w którym mechanizm zaczyna działać. Sama encja w bazie niczego jeszcze nie zmienia w UI.
 
 ## Minimalny zestaw do przeniesienia do innego projektu XAF
 
