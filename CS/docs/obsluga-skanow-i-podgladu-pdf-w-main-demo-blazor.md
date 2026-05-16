@@ -49,6 +49,54 @@ Najważniejsze decyzje:
 - `DocumentFile` nie ma własnej pozycji nawigacyjnej, bo w tym wariancie ma żyć głównie jako kolekcja podrzędna,
 - podgląd jest oddzielony od pola `File` przez właściwość `PreviewFile`, dzięki czemu nie trzeba podmieniać standardowego edytora `FileData` globalnie.
 
+Minimalny przykład słownika typów dokumentów wygląda tak:
+
+```csharp
+[DefaultClassOptions]
+[ImageName("BO_Category")]
+[XafDefaultProperty(nameof(Name))]
+public class DocumentFileType : BaseObject {
+    [RuleRequiredField]
+    [RuleUniqueValue]
+    [MaxLength(20)]
+    public virtual string Code { get; set; }
+
+    [RuleRequiredField]
+    [MaxLength(100)]
+    public virtual string Name { get; set; }
+
+    [MaxLength(255)]
+    public virtual string Description { get; set; }
+
+    public virtual bool IsActive { get; set; } = true;
+}
+```
+
+Minimalny przykład encji dokumentu:
+
+```csharp
+[ImageName("BO_FileAttachment")]
+[XafDefaultProperty(nameof(DisplayName))]
+public class DocumentFile : BaseObject {
+    [RuleRequiredField]
+    [EditorAlias(DevExpress.ExpressApp.Editors.EditorAliases.FileDataPropertyEditor)]
+    public virtual FileData File { get; set; }
+
+    public virtual DocumentFileType Type { get; set; }
+    public virtual string Description { get; set; }
+    public virtual DateTime UploadedAtUtc { get; set; }
+
+    public virtual Employee Employee { get; set; }
+    public virtual DemoTask DemoTask { get; set; }
+
+    [NotMapped]
+    [EditorAlias(EditorAliases.DocumentPreviewPropertyEditor)]
+    public virtual DocumentFilePreview PreviewFile => new(File);
+}
+```
+
+To są właśnie klasy, które potem można skopiować do własnego projektu i dopasować do swoich właścicieli dokumentów.
+
 ### 2. Powiązanie z obiektami biznesowymi
 
 Zmienione zostały:
@@ -66,6 +114,14 @@ To daje dwa efekty:
 - nested list view może być obsłużony jednym kontrolerem,
 - usunięcie właściciela usuwa jego dokumenty razem z obiektem nadrzędnym.
 
+Sam interfejs jest celowo mały:
+
+```csharp
+public interface IHasDocumentFiles {
+    IList<DocumentFile> DocumentFiles { get; set; }
+}
+```
+
 ### 3. `DbContext` i konfiguracja EF Core
 
 Zmiany trafiły do:
@@ -79,6 +135,25 @@ Doszły:
 - relacje `DocumentFile -> Employee`,
 - relacje `DocumentFile -> DemoTask`,
 - kolumna `UploadedAtUtc` mapowana jako `datetime2`.
+
+Minimalny fragment `DbContext`:
+
+```csharp
+public DbSet<DocumentFile> DocumentFiles { get; set; }
+public DbSet<DocumentFileType> DocumentFileTypes { get; set; }
+```
+
+oraz relacje:
+
+```csharp
+modelBuilder.Entity<DocumentFile>()
+    .HasOne(file => file.Employee)
+    .WithMany(employee => employee.DocumentFiles);
+
+modelBuilder.Entity<DocumentFile>()
+    .HasOne(file => file.DemoTask)
+    .WithMany(task => task.DocumentFiles);
+```
 
 W tym repo nie była potrzebna osobna migracja do samego builda i testów, bo aplikacja i tak działa w modelu aktualizacji schematu przy starcie. Gdyby celem było wdrożenie do środowiska, w którym migracje są utrzymywane ręcznie, trzeba byłoby dodać standardowe `dotnet ef migrations add`.
 
@@ -149,6 +224,24 @@ Mechanizm działa tak:
 - dla obrazów renderowany jest `<img>`,
 - dla pozostałych rozszerzeń użytkownik dostaje jasny komunikat i przycisk pobrania.
 
+Najważniejszy fragment renderera wygląda tak:
+
+```razor
+@if (Extension == "pdf") {
+    <object data="@ContentUrl" type="application/pdf" width="100%" height="800"></object>
+}
+else if (Extension is "jpg" or "jpeg" or "png" or "gif") {
+    <img src="@ContentUrl" style="max-width:100%; max-height:800px;" alt="@FileName" />
+}
+else {
+    <div class="alert alert-info">
+        Podgląd inline jest dostępny dla PDF i obrazów. Ten plik można pobrać.
+    </div>
+}
+```
+
+To jest prosty wariant, ale do większości wdrożeń wystarcza jako pierwszy krok.
+
 W tej wersji:
 
 - **PDF i obrazy mają podgląd inline**,
@@ -185,6 +278,45 @@ Endpoint:
 - obsługuje `Employee` i `DemoTask`,
 - przypisuje typ `OTHER`, jeśli `typeId` nie został podany,
 - waliduje whitelistę rozszerzeń.
+
+Minimalny przykład endpointu:
+
+```csharp
+[ApiController]
+[Authorize]
+[Route("api/document-files")]
+public class DocumentFileUploadController : ControllerBase {
+    [HttpPost("upload")]
+    public async Task<IActionResult> Upload(
+        [FromForm] List<IFormFile> files,
+        [FromForm] string ownerObjectType,
+        [FromForm] Guid ownerObjectId,
+        [FromForm] Guid? typeId,
+        [FromForm] string description) {
+
+        using IObjectSpace objectSpace = objectSpaceFactory.CreateNonSecuredObjectSpace(typeof(DocumentFile));
+        DocumentFileType documentType = ResolveDocumentType(objectSpace, typeId);
+
+        foreach (var formFile in files.Where(item => item.Length > 0)) {
+            var documentFile = objectSpace.CreateObject<DocumentFile>();
+            var fileData = objectSpace.CreateObject<FileData>();
+
+            await using var stream = formFile.OpenReadStream();
+            fileData.LoadFromStream(formFile.FileName, stream);
+
+            documentFile.File = fileData;
+            documentFile.Type = documentType;
+            documentFile.Description = description;
+            AttachToOwner(objectSpace, documentFile, ownerObjectType, ownerObjectId);
+        }
+
+        objectSpace.CommitChanges();
+        return Ok();
+    }
+}
+```
+
+Ten kod pokazuje najważniejszą rzecz: każdy przesłany plik staje się osobnym rekordem `DocumentFile`, przypiętym do jednego właściciela.
 
 ## Testy
 
