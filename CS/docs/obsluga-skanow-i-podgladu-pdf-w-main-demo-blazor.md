@@ -1,6 +1,6 @@
 # Obsługa skanów i podglądu PDF w MainDemo Blazor
 
-Ten dokument pokazuje, jak wdrożyć pełną obsługę dokumentów w aplikacji XAF Blazor + EF Core.
+Ten dokument pokazuje, jak dodać dokumenty, upload wielu plików i podgląd PDF do aplikacji XAF Blazor + EF Core.
 
 Cel:
 
@@ -10,68 +10,60 @@ Cel:
 4. każdy plik zapisuje się jako osobny rekord `DocumentFile`,
 5. po otwarciu dokumentu PDF jest widoczny inline.
 
-Ten dokument pokazuje tylko ten wariant, który działa w tej aplikacji.
+Opisuję tylko wariant wdrożony w tej aplikacji.
 
 ## Co trzeba dodać
 
-Żeby to działało od początku do końca, trzeba dołożyć kilka elementów w czterech miejscach:
+Trzeba dodać cztery grupy elementów:
 
 1. w modelu danych,
 2. w `DbContext`,
 3. w warstwie XAF i Blazor,
 4. w modelu widoków.
 
-Każdy z tych elementów ma własną rolę. Poniżej jest to rozpisane w takiej kolejności, w jakiej nowy programista zwykle buduje taki mechanizm.
+Najpierw model danych. Potem baza. Na końcu UI i widoki.
 
 ### 1. Klasy danych
 
-Najpierw trzeba dodać klasy, które będą przechowywać dokumenty i typy dokumentów.
-
 - `DocumentFileType`
   To słownik typów dokumentów, na przykład `Faktura`, `Umowa`, `Korespondencja`.
-  Użytkownik wybiera tę wartość przy dodawaniu pliku.
 
 - `DocumentFile`
-  To właściwa encja dokumentu.
-  Przechowuje plik, typ dokumentu, opis, datę dodania i dane potrzebne do podglądu.
+  To encja dokumentu. Przechowuje plik, typ, opis i datę dodania.
 
 - `IHasDocumentFiles`
   To interfejs dla obiektów, które mają mieć zakładkę `Załączniki`.
-  Dzięki temu jeden kontroler XAF może obsłużyć różne typy właścicieli dokumentów.
+  Dzięki temu jeden kontroler XAF obsługuje różne klasy właścicieli.
 
 - `DocumentFiles` na właścicielu
   To kolekcja dokumentów na klasie takiej jak `Employee` albo `DemoTask`.
-  To właśnie ta kolekcja jest pokazywana użytkownikowi na zakładce `Załączniki`.
 
 - `DocumentFileUploadParameters`
   To obiekt pomocniczy do popupu `Dodaj pliki`.
-  Trzyma tymczasowo typ dokumentu, opis i identyfikator właściciela, do którego mają zostać przypięte pliki.
+  Trzyma typ dokumentu, opis i identyfikator właściciela.
 
 ### 2. Rejestracja w bazie i `DbContext`
 
-Kiedy klasy już istnieją, trzeba powiedzieć EF Core, że mają być zapisane w bazie.
-
 - `DbSet<DocumentFile>`
-  Dzięki temu dokumenty stają się normalną tabelą w bazie danych.
+  To tabela dokumentów.
 
 - `DbSet<DocumentFileType>`
-  Dzięki temu słownik typów dokumentów też trafia do bazy i może być używany z UI.
+  To tabela typów dokumentów.
 
 - relacje `DocumentFile -> Employee` i `DocumentFile -> DemoTask`
-  Te relacje mówią EF Core, do jakiego właściciela należy dokument.
-  Bez nich kolekcja `DocumentFiles` na właścicielu nie będzie działała poprawnie.
+  Te relacje wskazują właściciela dokumentu.
 
 - mapowanie `UploadedAtUtc`
-  To zwykły detal bazy, ale warto go ustawić jawnie, żeby nie zostawiać typu kolumny przypadkowi providera.
+  Ustaw je jawnie.
 
 ### 3. Warstwa XAF i Blazor
 
-Gdy model danych i baza są gotowe, trzeba dodać elementy, które użytkownik zobaczy i których użyje.
-
 - `DocumentFileNestedListViewController`
-  To kontroler XAF, który dodaje akcję `Dodaj pliki`.
-  On nie zapisuje plików sam.
-  Jego rola to:
+  Dodaje akcję `Dodaj pliki`.
+  Otwiera popup i odświeża listę.
+  Nie zapisuje plików sam.
+
+  Robi cztery rzeczy:
   1. pokazać akcję na nested liście dokumentów,
   2. otworzyć popup,
   3. przekazać do popupu informację, kto jest właścicielem dokumentów,
@@ -79,27 +71,24 @@ Gdy model danych i baza są gotowe, trzeba dodać elementy, które użytkownik z
 
 - `DocumentUploadAreaRenderer`
   To komponent Blazor z `DxUpload`.
-  To on daje użytkownikowi możliwość przeciągnięcia naraz wielu plików, na przykład 20 PDF-ów.
+  Umożliwia przeciągnięcie wielu plików.
 
 - `DocumentFileUploadController`
-  To endpoint HTTP, do którego `DxUpload` wysyła pliki.
-  Dla każdego pliku tworzy osobny rekord `DocumentFile`, przypina go do właściciela i zapisuje w bazie.
+  To endpoint HTTP.
+  Dla każdego pliku tworzy osobny rekord `DocumentFile`.
 
 - `DocumentPreviewRenderer`
-  To komponent odpowiedzialny za podgląd dokumentu.
-  Dla PDF osadza plik w `<object>`, więc renderowanie wykonuje standardowa przeglądarka PDF w browserze użytkownika.
+  To komponent podglądu.
+  Dla PDF używa `<object>`.
   Dla obrazów używa `<img>`.
 
 ### 4. Model widoków
 
-Na końcu trzeba jeszcze włączyć to w UI XAF.
-
 - wpis `DocumentFiles` do detail view właściciela
-  Dzięki temu pojawia się zakładka albo sekcja `Załączniki`.
-  Bez tego użytkownik nie zobaczy listy dokumentów ani akcji `Dodaj pliki`.
+  Dzięki temu użytkownik widzi zakładkę `Załączniki`.
 
 - `DocumentFile_DetailView` z `PreviewFile`
-  Dzięki temu po otwarciu konkretnego dokumentu użytkownik widzi nie tylko metadane, ale też podgląd PDF albo obrazu.
+  Dzięki temu po otwarciu dokumentu widać podgląd.
 
 ## Krok 1. Słownik typów dokumentów
 
@@ -173,12 +162,12 @@ public class DocumentFile : BaseObject {
 }
 ```
 
-W tej aplikacji `DocumentFile` ma dwa właścicielskie pola:
+W tej aplikacji `DocumentFile` ma dwa pola właściciela:
 
 1. `Employee`
 2. `DemoTask`
 
-To wystarcza dla tego wdrożenia.
+To wystarcza w tym projekcie.
 
 ## Krok 3. Interfejs i kolekcja dokumentów na właścicielu
 
@@ -201,7 +190,7 @@ Na właścicielu:
 public virtual IList<DocumentFile> DocumentFiles { get; set; } = new ObservableCollection<DocumentFile>();
 ```
 
-Tak jest w:
+Tak jest w klasach:
 
 1. [Employee.cs](C:/Users/Programista/source/repos/MainDemo.NET.EFCore/CS/MainDemo.Module/BusinessObjects/Employee.cs)
 2. [DemoTask.cs](C:/Users/Programista/source/repos/MainDemo.NET.EFCore/CS/MainDemo.Module/BusinessObjects/DemoTask.cs)
@@ -291,7 +280,7 @@ public class DocumentFileUploadParameters {
 
 ## Krok 7. Kontroler XAF z akcją `Dodaj pliki`
 
-To jest klasa, która uruchamia cały proces.
+Ta klasa dodaje akcję `Dodaj pliki` i otwiera popup uploadu.
 
 Plik:
 
@@ -507,6 +496,156 @@ Pełny przepływ jest taki:
 10. po zamknięciu popupu lista dokumentów się odświeża,
 11. po otwarciu dokumentu detail view pokazuje PDF przez `<object>`.
 
+## Jak to zostało dołożone do `Resume` pracownika
+
+W tym repo istnieje już klasa:
+
+- [Resume.cs](C:/Users/Programista/source/repos/MainDemo.NET.EFCore/CS/MainDemo.Module/BusinessObjects/Resume.cs)
+
+To jest klasa biznesowa CV pracownika.
+
+Kod:
+
+```csharp
+public class Resume : BaseObject {
+    [RuleRequiredField]
+    public virtual Employee Employee { get; set; }
+
+    [FileTypeFilter("pdf-only", "PDF file", "*.pdf")]
+    public virtual FileData File { get; set; }
+
+    [EditorAlias(EditorAliases.PdfViewerPropertyEditor)]
+    public FileData ResumeView => File;
+}
+```
+
+Ta klasa miała już:
+
+1. powiązanie z `Employee`,
+2. pojedynczy plik PDF,
+3. podgląd PDF w detail view.
+
+Brakowało dodawania wielu PDF-ów przez drag and drop na `Employee.Resumes`.
+
+Dodałem to osobno. `Resume` i `DocumentFile` dalej mają różne role.
+
+### 1. Popup dla uploadu CV
+
+Plik:
+
+- [ResumeUploadParameters.cs](C:/Users/Programista/source/repos/MainDemo.NET.EFCore/CS/MainDemo.Module/BusinessObjects/ResumeUploadParameters.cs)
+
+Kod:
+
+```csharp
+[DomainComponent]
+public class ResumeUploadParameters {
+    [EditorAlias(EditorAliases.ResumeUploadAreaPropertyEditor)]
+    public DocumentUploadArea UploadArea { get; set; } = new();
+
+    public Guid EmployeeId { get; set; }
+}
+```
+
+Ten obiekt trzyma tylko `EmployeeId`.
+
+### 2. Kontroler nested listy `Resumes`
+
+Plik:
+
+- [ResumeNestedListViewController.cs](C:/Users/Programista/source/repos/MainDemo.NET.EFCore/CS/MainDemo.Blazor.Server/Controllers/ResumeNestedListViewController.cs)
+
+Ten kontroler:
+
+1. działa na nested liście `Resume`,
+2. dodaje akcję `Dodaj CV`,
+3. otwiera `ResumeUploadParameters_DetailView`,
+4. po zamknięciu popupu odświeża listę.
+
+Najważniejszy fragment:
+
+```csharp
+addResumesAction = new PopupWindowShowAction(this, "AddEmployeeResumes", PredefinedCategory.RecordEdit) {
+    Caption = "Dodaj CV",
+    ImageName = "BO_Resume",
+    AcceptButtonCaption = "Zamknij"
+};
+```
+
+### 3. Komponent uploadu PDF
+
+Pliki:
+
+- [ResumeUploadAreaPropertyEditor.cs](C:/Users/Programista/source/repos/MainDemo.NET.EFCore/CS/MainDemo.Blazor.Server/Editors/Documents/ResumeUploadAreaPropertyEditor.cs)
+- [ResumeUploadAreaRenderer.razor](C:/Users/Programista/source/repos/MainDemo.NET.EFCore/CS/MainDemo.Blazor.Server/Editors/Documents/ResumeUploadAreaRenderer.razor)
+
+Najważniejszy fragment:
+
+```razor
+<DxUpload Name="files"
+          UploadUrl="@UploadUrl"
+          AllowMultiFileUpload="true"
+          UploadMode="UploadMode.Instant"
+          AllowedFileExtensions="@AllowedExtensions"
+          AdditionalParameters="@AdditionalParameters" />
+```
+
+I ustawienia:
+
+```csharp
+private const string UploadUrl = "/api/resumes/upload";
+private static readonly List<string> AllowedExtensions = [".pdf"];
+```
+
+To daje:
+
+1. przeciągnięcie wielu PDF-ów naraz,
+2. natychmiastowy upload,
+3. ograniczenie do PDF.
+
+### 4. Endpoint zapisujący `Resume`
+
+Plik:
+
+- [ResumeUploadController.cs](C:/Users/Programista/source/repos/MainDemo.NET.EFCore/CS/MainDemo.Blazor.Server/API/Documents/ResumeUploadController.cs)
+
+Ten endpoint:
+
+1. przyjmuje listę plików,
+2. przyjmuje `employeeId`,
+3. odrzuca rozszerzenia inne niż `.pdf`,
+4. dla każdego pliku tworzy osobny rekord `Resume`,
+5. ustawia `Resume.Employee`,
+6. ustawia `Resume.File`,
+7. zapisuje zmiany.
+
+Najważniejszy fragment:
+
+```csharp
+var resume = objectSpace.CreateObject<Resume>();
+var fileData = objectSpace.CreateObject<FileData>();
+
+await using var stream = formFile.OpenReadStream();
+fileData.LoadFromStream(formFile.FileName, stream);
+
+resume.Employee = employee;
+resume.File = fileData;
+```
+
+## Efekt w UI dla pracownika
+
+Na `Employee_DetailView` przywróciłem zakładkę `CV`.
+
+Efekt:
+
+1. użytkownik otwiera pracownika,
+2. przechodzi do zakładki `CV`,
+3. widzi nested listę `Resumes`,
+4. klika `Dodaj CV`,
+5. przeciąga wiele PDF-ów,
+6. każdy PDF zapisuje się jako osobny rekord `Resume`,
+7. po otwarciu rekordu działa standardowy podgląd PDF z `ResumeView`.
+
 ## Komendy
 
 Build:
@@ -555,3 +694,49 @@ Jeżeli ktoś ma dodać ten mechanizm do własnej aplikacji XAF Blazor + EF Core
 12. `PreviewFile` w detail view dokumentu
 
 To jest najkrótsza kompletna ścieżka do osiągnięcia celu.
+
+## Instrukcja dla agenta AI
+
+Wdróż pełną obsługę dokumentów w aplikacji XAF Blazor + EF Core zgodnie z tym dokumentem.
+
+Zakres:
+
+1. dodaj `DocumentFileType`,
+2. dodaj `DocumentFile`,
+3. dodaj `IHasDocumentFiles`,
+4. dodaj kolekcję `DocumentFiles` na klasach właścicieli,
+5. zarejestruj `DbSet` i relacje w `DbContext`,
+6. dodaj `DocumentFileUploadParameters`,
+7. dodaj `DocumentFileNestedListViewController`,
+8. dodaj `DocumentUploadAreaRenderer` z `DxUpload`,
+9. dodaj `DocumentFileUploadController`,
+10. dodaj `DocumentPreviewRenderer`,
+11. dodaj zakładkę `Załączniki` do detail view właściciela,
+12. dodaj `PreviewFile` do `DocumentFile_DetailView`,
+13. dodaj seed typów dokumentów,
+14. dodaj migrację EF Core,
+15. dodaj test integracyjny uploadu wielu plików,
+16. skompiluj rozwiązanie,
+17. uruchom testy,
+18. uruchom aplikację i popraw błędy kompilacji, błędy uruchomieniowe oraz brakujące rejestracje.
+
+Zasady:
+
+1. użyj powiązania od właściciela przez `DocumentFiles`,
+2. nie dodawaj wielu pól właściciela do `DocumentFile`,
+3. dla PDF użyj standardowej przeglądarki PDF w przeglądarce przez `<object>`,
+4. nie dodawaj wariantów pobocznych,
+5. zostaw jedną działającą ścieżkę od uploadu do podglądu.
+
+Warunek zakończenia:
+
+1. użytkownik może wejść na detail view właściciela,
+2. może otworzyć zakładkę `Załączniki`,
+3. może kliknąć `Dodaj pliki`,
+4. może przeciągnąć wiele PDF-ów naraz,
+5. każdy plik zapisuje się jako osobny `DocumentFile`,
+6. lista odświeża się po zamknięciu popupu,
+7. detail view dokumentu pokazuje PDF inline,
+8. build przechodzi,
+9. testy przechodzą,
+10. rozwiązanie uruchamia się bez błędów.

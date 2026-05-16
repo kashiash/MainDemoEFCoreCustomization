@@ -1,6 +1,6 @@
 # Domknięcie polskiej lokalizacji klas i widoków w MainDemo Blazor
 
-Ten dokument jest kolejnym krokiem po artykule `obsluga-jezyka-polskiego-w-main-demo-blazor.md`. Tam został opisany mechanizm włączenia `pl-PL` w aplikacji. Tutaj opisuję uzupełnienie modelu lokalizacji XAF tak, aby po przełączeniu języka na polski interfejs nie mieszał polskich nazw wyświetlanych z angielskimi nazwami klas, enumów i widoków.
+Ten dokument jest kolejnym krokiem po artykule `obsluga-jezyka-polskiego-w-main-demo-blazor.md`. Tam opisałem włączenie `pl-PL`. Tutaj pokazuję, jak uzupełniłem model lokalizacji XAF, żeby interfejs po polsku nie mieszał polskich i angielskich nazw.
 
 ## Co było nie domknięte
 

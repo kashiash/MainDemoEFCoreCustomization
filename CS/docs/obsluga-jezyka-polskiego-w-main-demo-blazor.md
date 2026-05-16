@@ -1,6 +1,6 @@
 # Dodanie języka polskiego do MainDemo.Blazor.Server
 
-Ten dokument pokazuje dokładnie, jak została dodana obsługa języka polskiego do projektu `MainDemo.NET.EFCore`. To nie jest opis ogólny. To jest zapis realnych zmian wykonanych w tym repo, razem z plikami, fragmentami kodu i uzasadnieniem.
+Ten dokument pokazuje, jak dodałem język polski do projektu `MainDemo.NET.EFCore`. To zapis zmian wykonanych w tym repo.
 
 ## Co było celem
 

@@ -1,0 +1,50 @@
+@using DevExpress.Blazor
+
+<div class="card p-3">
+    <DxUpload Name="files"
+              UploadUrl="@UploadUrl"
+              AllowMultiFileUpload="true"
+              UploadMode="UploadMode.Instant"
+              AllowedFileExtensions="@AllowedExtensions"
+              MaxFileSize="100000000"
+              ExternalDropZoneCssSelector=".resume-upload-drop-zone"
+              ExternalSelectButtonCssSelector=".resume-upload-select-button"
+              AdditionalParameters="@AdditionalParameters"
+              FileUploaded="@OnFileUploaded" />
+
+    <div class="resume-upload-drop-zone p-4 mt-2 text-center text-muted"
+         style="border:2px dashed #cfcfcf; border-radius:8px; min-height:120px;">
+        Przeciągnij pliki PDF tutaj
+    </div>
+
+    <button class="resume-upload-select-button btn btn-primary mt-2" type="button">
+        Wybierz pliki PDF
+    </button>
+
+    @if (UploadedCount > 0) {
+        <div class="alert alert-success mt-2">
+            Wgrano plików: @UploadedCount. Zamknij okno, aby odświeżyć listę CV.
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public Guid EmployeeId { get; set; }
+
+    private const string UploadUrl = "/api/resumes/upload";
+    private static readonly List<string> AllowedExtensions = [".pdf"];
+
+    private Dictionary<string, string> AdditionalParameters { get; set; } = new();
+    private int UploadedCount { get; set; }
+
+    protected override void OnParametersSet() {
+        AdditionalParameters = new Dictionary<string, string> {
+            ["employeeId"] = EmployeeId.ToString()
+        };
+    }
+
+    private void OnFileUploaded(FileUploadEventArgs args) {
+        UploadedCount++;
+        StateHasChanged();
+    }
+}

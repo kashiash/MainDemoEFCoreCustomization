@@ -26,6 +26,7 @@
     <Compile Include="LocalizationTests.cs" />
     <Compile Include="DynamicAppearanceRuleTests.cs" />
     <Compile Include="DocumentFileUploadTests.cs" />
+    <Compile Include="ResumeUploadTests.cs" />
     <Compile Include="ReportTests.cs" />
 	  <Compile Include="TestInfrastructure\*.cs" />
   </ItemGroup>

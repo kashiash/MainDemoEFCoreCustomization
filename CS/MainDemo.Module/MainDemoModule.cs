@@ -40,6 +40,7 @@ public sealed class MainDemoModule : ModuleBase {
         this.AdditionalExportedTypes.Add(typeof(CustomNonPersistentObject));
         this.AdditionalExportedTypes.Add(typeof(UseSQLAlternativeInfo));
         this.AdditionalExportedTypes.Add(typeof(DocumentFileUploadParameters));
+        this.AdditionalExportedTypes.Add(typeof(ResumeUploadParameters));
     }
     public override void Setup(ApplicationModulesManager moduleManager) {
         base.Setup(moduleManager);

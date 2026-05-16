@@ -9,7 +9,7 @@ Standardowy `ConditionalAppearance` w XAF świetnie działa dla reguł zapisanyc
 3. trzymać wygląd jako dane, a nie jako atrybuty w klasach,
 4. używać tego samego wzorca w wielu projektach.
 
-W tym repo mechanizm został dodany jako warstwa nad standardowym `AppearanceController`. Reguły są zapisywane w bazie, ładowane do cache i dokładane do pipeline XAF w czasie działania.
+W tym repo dodałem warstwę nad standardowym `AppearanceController`. Reguły są zapisywane w bazie, ładowane do pamięci i dokładane do pipeline XAF w czasie działania.
 
 ## Co dokładnie zostało dodane w MainDemo
 
@@ -31,7 +31,7 @@ To jest wariant pragmatyczny. Nie próbuje odwzorować wszystkiego z HIS jeden d
 4. seed przykładowej reguły,
 5. testy sprawdzające dane i filtrowanie.
 
-## Klasy, które faktycznie tworzą ten mechanizm
+## Klasy, które tworzą to rozwiązanie
 
 Tutaj nie chodzi o ogólny pomysł, tylko o trzy konkretne klasy:
 
@@ -39,7 +39,7 @@ Tutaj nie chodzi o ogólny pomysł, tylko o trzy konkretne klasy:
 2. `DynamicAppearanceRuleStorage` jako procesowy cache reguł,
 3. `DynamicAppearanceRuleViewController` jako punkt podpięcia do `AppearanceController`.
 
-Bez tych trzech elementów nie ma pełnego mechanizmu.
+Bez tych trzech elementów rozwiązanie nie działa w pełni.
 
 ## Jak działa ten wariant
 

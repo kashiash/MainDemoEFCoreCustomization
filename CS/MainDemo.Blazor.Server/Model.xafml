@@ -157,6 +157,11 @@
 				<ColumnInfo Id="UploadedAtUtc" MinWidth="140" />
 			</Columns>
 		</ListView>
+		<ListView Id="Employee_Resumes_ListView" IsNewNode="True">
+			<Columns IsNewNode="True">
+				<ColumnInfo Id="File" MinWidth="220" IsNewNode="True" />
+			</Columns>
+		</ListView>
 		<ListView Id="Resume_Portfolio_ListView">
 			<Columns>
 				<ColumnInfo Id="File" SortIndex="-1" SortOrder="None" />

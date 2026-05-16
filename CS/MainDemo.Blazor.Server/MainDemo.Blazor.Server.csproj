@@ -100,6 +100,7 @@
     <Compile Include="Services\**\*.cs" />
     <Compile Include="API\CRUD\CustomDataService.cs" />
     <Compile Include="API\Documents\DocumentFileUploadController.cs" />
+    <Compile Include="API\Documents\ResumeUploadController.cs" />
     <Compile Include="API\Security\AuthenticationController.cs" />
     <Compile Include="Controllers\DisableActionsController.cs" />
     <Compile Include="Controllers\DocumentFileNestedListViewController.cs" />
@@ -107,6 +108,7 @@
     <Compile Include="Controllers\LogonParametersViewController.cs" />
     <Compile Include="Controllers\LogonTitleController.cs" />
     <Compile Include="Controllers\ReportLocalizationController.cs" />
+    <Compile Include="Controllers\ResumeNestedListViewController.cs" />
     <Compile Include="API\Reports\ReportController.cs" />
     <Compile Include="Controllers\UseSQLAlternativeInfoController.cs" />
     <Compile Include="CustomTypePropertyEditor.cs" />

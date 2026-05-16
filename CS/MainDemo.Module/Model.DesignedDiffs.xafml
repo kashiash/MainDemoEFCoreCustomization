@@ -313,6 +313,7 @@
         <PropertyEditor Id="Address2" Removed="True" />
         <PropertyEditor Id="Department.Office" PropertyName="Department.Office" IsNewNode="True" />
         <PropertyEditor Id="DocumentFiles" PropertyName="DocumentFiles" IsNewNode="True" />
+        <PropertyEditor Id="Resumes" PropertyName="Resumes" IsNewNode="True" />
         <PropertyEditor Id="Manager" ToolTip="Select a manager for the current Employee from available managers in the selected department" />
         <PropertyEditor Id="Position" ToolTip="Select a job position for the current Employee from available positions in the selected department" />
         <PropertyEditor Id="Tasks" ToolTip="View, assign or remove tasks for the current employee" />
@@ -383,7 +384,9 @@
               <LayoutItem Id="DocumentFiles" RelativeSize="100" ViewItem="DocumentFiles" IsNewNode="True" />
             </LayoutGroup>
             <LayoutGroup Id="Paychecks" Removed="True" />
-            <LayoutGroup Id="Resumes" Removed="True" />
+            <LayoutGroup Id="Resumes" Direction="Vertical" RelativeSize="100" Index="4" Caption="Resumes" ImageName="BO_Resume" IsNewNode="True">
+              <LayoutItem Id="Resumes" RelativeSize="100" ViewItem="Resumes" IsNewNode="True" />
+            </LayoutGroup>
           </TabbedGroup>
         </LayoutGroup>
       </Layout>
@@ -607,6 +610,18 @@
               <LayoutItem Id="Description" ViewItem="Description" Index="1" IsNewNode="True" />
               <LayoutItem Id="UploadArea" ViewItem="UploadArea" ShowCaption="False" Index="2" IsNewNode="True" />
             </LayoutGroup>
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <DetailView Id="ResumeUploadParameters_DetailView" IsNewNode="True">
+      <Items IsNewNode="True">
+        <PropertyEditor Id="UploadArea" PropertyName="UploadArea" IsNewNode="True" />
+      </Items>
+      <Layout IsNewNode="True">
+        <LayoutGroup Id="Main" IsNewNode="True">
+          <LayoutGroup Id="ResumeUpload" Caption="Upload" IsNewNode="True">
+            <LayoutItem Id="UploadArea" ViewItem="UploadArea" ShowCaption="False" IsNewNode="True" />
           </LayoutGroup>
         </LayoutGroup>
       </Layout>
