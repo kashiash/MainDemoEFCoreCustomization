@@ -23,12 +23,12 @@ public class DocumentFileUploadTests : BaseWebApiTest {
             var objectSpaceFactory = scope.ServiceProvider.GetRequiredService<INonSecuredObjectSpaceFactory>();
             using var objectSpace = objectSpaceFactory.CreateNonSecuredObjectSpace(typeof(Employee));
 
-            var employee = objectSpace.CreateObject<Employee>();
-            employee.FirstName = "Document";
-            employee.LastName = "Upload";
-            employee.Email = TestEmployeeEmail;
+            var testEmployee = objectSpace.CreateObject<Employee>();
+            testEmployee.FirstName = "Document";
+            testEmployee.LastName = "Upload";
+            testEmployee.Email = TestEmployeeEmail;
             objectSpace.CommitChanges();
-            employeeId = employee.ID;
+            employeeId = testEmployee.ID;
 
             invoiceTypeId = objectSpace.FirstOrDefault<DocumentFileType>(item => item.Code == "INVOICE").ID;
         }
@@ -51,11 +51,12 @@ public class DocumentFileUploadTests : BaseWebApiTest {
 
         using var verificationScope = fixture.Host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
         var verificationFactory = verificationScope.ServiceProvider.GetRequiredService<INonSecuredObjectSpaceFactory>();
-        using var verificationObjectSpace = verificationFactory.CreateNonSecuredObjectSpace(typeof(DocumentFile));
+        using var verificationObjectSpace = verificationFactory.CreateNonSecuredObjectSpace(typeof(Employee));
 
-        var documents = verificationObjectSpace.GetObjectsQuery<DocumentFile>()
-            .Where(item => item.Employee != null && item.Employee.Email == TestEmployeeEmail)
-            .ToList();
+        var loadedEmployee = verificationObjectSpace.GetObjectsQuery<Employee>()
+            .Where(item => item.Email == TestEmployeeEmail)
+            .Single();
+        var documents = loadedEmployee.DocumentFiles.ToList();
 
         Assert.Equal(3, documents.Count);
         Assert.All(documents, item => Assert.Equal("INVOICE", item.Type.Code));
@@ -71,12 +72,12 @@ public class DocumentFileUploadTests : BaseWebApiTest {
             var objectSpaceFactory = scope.ServiceProvider.GetRequiredService<INonSecuredObjectSpaceFactory>();
             using var objectSpace = objectSpaceFactory.CreateNonSecuredObjectSpace(typeof(Employee));
 
-            var employee = objectSpace.CreateObject<Employee>();
-            employee.FirstName = "Document";
-            employee.LastName = "Fallback";
-            employee.Email = "document-upload-tests-fallback@maindemo.local";
+            var testEmployee = objectSpace.CreateObject<Employee>();
+            testEmployee.FirstName = "Document";
+            testEmployee.LastName = "Fallback";
+            testEmployee.Email = "document-upload-tests-fallback@maindemo.local";
             objectSpace.CommitChanges();
-            employeeId = employee.ID;
+            employeeId = testEmployee.ID;
         }
 
         using var formDataContent = new MultipartFormDataContent();
@@ -95,11 +96,12 @@ public class DocumentFileUploadTests : BaseWebApiTest {
 
         using var verificationScope = fixture.Host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
         var verificationFactory = verificationScope.ServiceProvider.GetRequiredService<INonSecuredObjectSpaceFactory>();
-        using var verificationObjectSpace = verificationFactory.CreateNonSecuredObjectSpace(typeof(DocumentFile));
+        using var verificationObjectSpace = verificationFactory.CreateNonSecuredObjectSpace(typeof(Employee));
 
-        var document = verificationObjectSpace.GetObjectsQuery<DocumentFile>()
-            .Where(item => item.Employee != null && item.Employee.Email == "document-upload-tests-fallback@maindemo.local")
+        var loadedEmployee = verificationObjectSpace.GetObjectsQuery<Employee>()
+            .Where(item => item.Email == "document-upload-tests-fallback@maindemo.local")
             .Single();
+        var document = loadedEmployee.DocumentFiles.Single();
 
         Assert.Equal("OTHER", document.Type.Code);
     }

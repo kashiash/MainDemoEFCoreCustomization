@@ -45,7 +45,7 @@ Najważniejsze decyzje:
 
 - `DocumentFileType` jest słownikiem typu dokumentu i ma `DefaultClassOptions`, bo ma być zarządzany z UI.
 - `DocumentFile` jest osobną encją, a nie próbą rozszerzenia istniejącego `PortfolioFileData`.
-- relacje do właścicieli są jawne: `Employee` i `DemoTask`,
+- w tej aplikacji dokumenty są przypinane przez kolekcję po stronie właściciela i obsługują dwa typy: `Employee` i `DemoTask`,
 - `DocumentFile` nie ma własnej pozycji nawigacyjnej, bo w tym wariancie ma żyć głównie jako kolekcja podrzędna,
 - podgląd jest oddzielony od pola `File` przez właściwość `PreviewFile`, dzięki czemu nie trzeba podmieniać standardowego edytora `FileData` globalnie.
 
@@ -86,18 +86,73 @@ public class DocumentFile : BaseObject {
     public virtual string Description { get; set; }
     public virtual DateTime UploadedAtUtc { get; set; }
 
-    public virtual Employee Employee { get; set; }
-    public virtual DemoTask DemoTask { get; set; }
-
     [NotMapped]
     [EditorAlias(EditorAliases.DocumentPreviewPropertyEditor)]
     public virtual DocumentFilePreview PreviewFile => new(File);
 }
 ```
 
-To są właśnie klasy, które potem można skopiować do własnego projektu i dopasować do swoich właścicieli dokumentów.
+To jest rdzeń dokumentu. Sam sposób powiązania z właścicielem zależy od wariantu modelu.
 
-### 2. Powiązanie z obiektami biznesowymi
+### 2. Dwa warianty powiązania dokumentu z właścicielem
+
+Przy dokumentach są dwie sensowne możliwości.
+
+#### Wariant A: powiązanie po stronie właściciela
+
+To jest wariant użyty w tym repo. Dobrze działa, gdy właścicieli jest mało, na przykład `Employee` i `DemoTask`.
+
+Właściciel ma kolekcję dokumentów:
+
+```csharp
+public interface IHasDocumentFiles {
+    IList<DocumentFile> DocumentFiles { get; set; }
+}
+
+public class Employee : BaseObject, IHasDocumentFiles {
+    [Aggregated]
+    public virtual IList<DocumentFile> DocumentFiles { get; set; } = new ObservableCollection<DocumentFile>();
+}
+
+public class DemoTask : BaseObject, IHasDocumentFiles {
+    [Aggregated]
+    public virtual IList<DocumentFile> DocumentFiles { get; set; } = new ObservableCollection<DocumentFile>();
+}
+```
+
+W tym wariancie aplikacja pracuje przez `owner.DocumentFiles.Add(documentFile)`. Tak zostało to zrobione w MainDemo, bo zależało nam na prostym UI XAF i na szybkim wdrożeniu dla dwóch typów.
+
+#### Wariant B: osobna klasa powiązania
+
+Jeżeli właścicieli ma być dużo, to lepiej nie dodawać do `DocumentFile` kolejnych pól `Customer`, `Invoice`, `Patient`, `Visit` i tak dalej. Wtedy dokument pozostaje czysty, a relacja siedzi w osobnej klasie:
+
+```csharp
+public class DocumentFile : BaseObject {
+    public virtual FileData File { get; set; }
+    public virtual DocumentFileType Type { get; set; }
+    public virtual IList<DocumentBinding> Bindings { get; set; } = new ObservableCollection<DocumentBinding>();
+}
+
+public class DocumentBinding : BaseObject {
+    public virtual DocumentFile Document { get; set; }
+
+    [MaxLength(500)]
+    public virtual string OwnerType { get; set; }
+
+    public virtual Guid OwnerId { get; set; }
+}
+```
+
+Ten wariant lepiej skaluje się przy dużej liczbie właścicieli, ale wymaga większej ilości własnego kodu po stronie XAF.
+
+W tej aplikacji używamy wariantu A, czyli powiązania od właściciela, bo:
+
+1. właścicieli jest mało,
+2. nested list view działa naturalnie,
+3. agregacja i usuwanie podrzędnych dokumentów są proste,
+4. nie trzeba budować dodatkowej warstwy `DocumentBinding`.
+
+### 3. Powiązanie z obiektami biznesowymi
 
 Zmienione zostały:
 
@@ -114,15 +169,7 @@ To daje dwa efekty:
 - nested list view może być obsłużony jednym kontrolerem,
 - usunięcie właściciela usuwa jego dokumenty razem z obiektem nadrzędnym.
 
-Sam interfejs jest celowo mały:
-
-```csharp
-public interface IHasDocumentFiles {
-    IList<DocumentFile> DocumentFiles { get; set; }
-}
-```
-
-### 3. `DbContext` i konfiguracja EF Core
+### 4. `DbContext` i konfiguracja EF Core
 
 Zmiany trafiły do:
 
@@ -132,8 +179,8 @@ Doszły:
 
 - `DbSet<DocumentFile> DocumentFiles`,
 - `DbSet<DocumentFileType> DocumentFileTypes`,
-- relacje `DocumentFile -> Employee`,
-- relacje `DocumentFile -> DemoTask`,
+- relacje dla kolekcji `Employee.DocumentFiles`,
+- relacje dla kolekcji `DemoTask.DocumentFiles`,
 - kolumna `UploadedAtUtc` mapowana jako `datetime2`.
 
 Minimalny fragment `DbContext`:
@@ -155,9 +202,11 @@ modelBuilder.Entity<DocumentFile>()
     .WithMany(task => task.DocumentFiles);
 ```
 
+To jest fragment z obecnego repo, czyli z wariantu A. Przy wariancie B z `DocumentBinding` relacje i filtracja wyglądałyby inaczej.
+
 W tym repo nie była potrzebna osobna migracja do samego builda i testów, bo aplikacja i tak działa w modelu aktualizacji schematu przy starcie. Gdyby celem było wdrożenie do środowiska, w którym migracje są utrzymywane ręcznie, trzeba byłoby dodać standardowe `dotnet ef migrations add`.
 
-### 4. Seed typów dokumentów i danych demonstracyjnych
+### 5. Seed typów dokumentów i danych demonstracyjnych
 
 Rozszerzony został:
 
@@ -182,7 +231,7 @@ To ma dwie zalety:
 - testy nie muszą ręcznie budować słownika od zera,
 - po uruchomieniu demówki od razu widać, że mechanizm działa.
 
-### 5. Model XAF i polska lokalizacja
+### 6. Model XAF i polska lokalizacja
 
 Zmienione zostały:
 
@@ -268,7 +317,7 @@ Przebieg jest następujący:
    - opis,
    - strefę drag-drop z `DxUpload`,
 5. `DxUpload` wysyła pliki na `/api/document-files/upload`,
-6. endpoint zapisuje każdy plik jako osobny rekord `DocumentFile`,
+6. endpoint zapisuje każdy plik jako osobny rekord `DocumentFile` i dodaje go do kolekcji dokumentów właściciela,
 7. po zamknięciu popupu lista jest odświeżana.
 
 Endpoint:
@@ -307,7 +356,7 @@ public class DocumentFileUploadController : ControllerBase {
             documentFile.File = fileData;
             documentFile.Type = documentType;
             documentFile.Description = description;
-            AttachToOwner(objectSpace, documentFile, ownerObjectType, ownerObjectId);
+            AddToOwnerDocuments(objectSpace, documentFile, ownerObjectType, ownerObjectId);
         }
 
         objectSpace.CommitChanges();
@@ -316,7 +365,7 @@ public class DocumentFileUploadController : ControllerBase {
 }
 ```
 
-Ten kod pokazuje najważniejszą rzecz: każdy przesłany plik staje się osobnym rekordem `DocumentFile`, przypiętym do jednego właściciela.
+Ten kod pokazuje najważniejszą rzecz: każdy przesłany plik staje się osobnym rekordem `DocumentFile`, a aplikacja przypina go do właściciela przez jego kolekcję dokumentów.
 
 ## Testy
 
@@ -470,3 +519,5 @@ Jeżeli chcesz przenieść ten wzorzec do innego projektu XAF Blazor + EF Core, 
 12. lokalizacja podpisów
 
 Jeżeli potrzebujesz tylko PDF preview bez uploadu wieloplikowego, wystarczy mniej: encja dokumentu, relacja do właściciela i edytor `PreviewFile`.
+
+Jeżeli właścicieli ma być dużo, nie kopiowałbym wariantu z wieloma polami właściciela w `DocumentFile`. Wtedy lepiej przejść na wariant B z osobną klasą `DocumentBinding`.

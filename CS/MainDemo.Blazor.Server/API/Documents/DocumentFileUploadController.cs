@@ -46,7 +46,7 @@ public class DocumentFileUploadController : ControllerBase {
             documentFile.File = fileData;
             documentFile.Type = documentType;
             documentFile.Description = description;
-            AttachToOwner(objectSpace, documentFile, ownerObjectType, ownerObjectId);
+            AddToOwnerDocuments(objectSpace, documentFile, ownerObjectType, ownerObjectId);
 
             result.Add(new {
                 documentFile.ID,
@@ -66,13 +66,17 @@ public class DocumentFileUploadController : ControllerBase {
         return objectSpace.FirstOrDefault<DocumentFileType>(item => item.Code == "OTHER");
     }
 
-    private static void AttachToOwner(IObjectSpace objectSpace, DocumentFile documentFile, string ownerObjectType, Guid ownerObjectId) {
+    private static void AddToOwnerDocuments(IObjectSpace objectSpace, DocumentFile documentFile, string ownerObjectType, Guid ownerObjectId) {
         switch (ownerObjectType) {
             case nameof(Employee):
-                documentFile.Employee = objectSpace.GetObjectByKey<Employee>(ownerObjectId);
+                var employee = objectSpace.GetObjectByKey<Employee>(ownerObjectId)
+                    ?? throw new InvalidOperationException($"Nie znaleziono właściciela typu {ownerObjectType} o kluczu {ownerObjectId}.");
+                employee.DocumentFiles.Add(documentFile);
                 break;
             case nameof(DemoTask):
-                documentFile.DemoTask = objectSpace.GetObjectByKey<DemoTask>(ownerObjectId);
+                var demoTask = objectSpace.GetObjectByKey<DemoTask>(ownerObjectId)
+                    ?? throw new InvalidOperationException($"Nie znaleziono właściciela typu {ownerObjectType} o kluczu {ownerObjectId}.");
+                demoTask.DocumentFiles.Add(documentFile);
                 break;
             default:
                 throw new InvalidOperationException($"Nieobsługiwany typ właściciela: {ownerObjectType}");
